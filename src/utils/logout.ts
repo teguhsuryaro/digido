@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
-import { NavigateFunction } from 'react-router-dom';
+import type { NavigateFunction } from 'react-router-dom';
 
 export async function handleLogout(navigate: NavigateFunction) {
   // 1. Bersihkan state lokal (Zustand) terlebih dahulu
