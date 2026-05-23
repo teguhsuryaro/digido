@@ -38,6 +38,7 @@ export default function UMKMDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [productRatings, setProductRatings] = useState<Record<string, { avg: number; count: number }>>({});
+  const userLocation = useLocationStore((s) => s.userLocation);
 
   useEffect(() => {
     if (!id) return;
@@ -114,8 +115,6 @@ export default function UMKMDetailPage() {
       </div>
     );
   }
-
-  const userLocation = useLocationStore((s) => s.userLocation);
 
   if (!umkm) return null;
 
