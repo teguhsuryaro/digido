@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Crown, Check, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -26,7 +25,6 @@ interface ActiveSub {
 }
 
 export default function SubscriptionPage() {
-  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
 
   const [plans, setPlans] = useState<Plan[]>([]);

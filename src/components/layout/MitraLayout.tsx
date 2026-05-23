@@ -1,7 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Package, ClipboardList, Truck, Settings, CreditCard, MessageCircle, ShoppingBag, LogOut, Store, User } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { supabase } from '@/lib/supabase';
 import { handleLogout } from '@/utils/logout';
 import Button from '@/components/ui/Button';
 

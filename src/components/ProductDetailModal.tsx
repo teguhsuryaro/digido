@@ -1,4 +1,4 @@
-import { X, Share2, Flag, Bookmark, Star, Package } from 'lucide-react';
+import { X, Share2, Flag, Bookmark, Package } from 'lucide-react';
 import StarRating from '@/components/StarRating';
 import { formatRupiah } from '@/utils/format';
 

@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
 
 type UserRole = 'guest' | 'pelanggan' | 'mitra';
 
