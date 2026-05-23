@@ -119,7 +119,10 @@ export default function UMKMDetailPage() {
 
   const ratings = umkm.reviews?.map((r: any) => r.rating) || [];
   const avgRating = ratings.length > 0 ? ratings.reduce((a: any, b: any) => a + b, 0) / ratings.length : 0;
-  const isDeliveryActive = umkm.delivery_settings?.is_active;
+  const deliverySettings = Array.isArray(umkm.delivery_settings) 
+    ? umkm.delivery_settings[0] 
+    : umkm.delivery_settings;
+  const isDeliveryActive = deliverySettings?.is_active;
 
   const userLocation = useLocationStore((s) => s.userLocation);
   let distanceText = null;
@@ -208,20 +211,31 @@ export default function UMKMDetailPage() {
             {/* Location & Navigation Section */}
             <section className="bg-surface-card rounded-card p-4 border border-border shadow-sm space-y-4">
               <h2 className="text-lg font-bold text-content-primary">Lokasi & Navigasi</h2>
-              <MapView 
-                lat={umkm.latitude} 
-                lng={umkm.longitude} 
-                label={umkm.name}
-                className="h-64 rounded-card overflow-hidden shadow-sm border border-border"
-              />
-              <Button 
-                variant="secondary" 
-                fullWidth 
-                className="flex items-center justify-center gap-2"
-                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${umkm.latitude},${umkm.longitude}`, '_blank')}
-              >
-                <MapPin size={14} /> Buka di Google Maps
-              </Button>
+              
+              {umkm.latitude && umkm.longitude ? (
+                <>
+                  <MapView 
+                    lat={umkm.latitude} 
+                    lng={umkm.longitude} 
+                    label={umkm.name}
+                    className="h-64 rounded-card overflow-hidden shadow-sm border border-border"
+                  />
+                  <Button 
+                    variant="secondary" 
+                    fullWidth 
+                    className="flex items-center justify-center gap-2"
+                    onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${umkm.latitude},${umkm.longitude}`, '_blank')}
+                  >
+                    <MapPin size={14} /> Buka di Google Maps
+                  </Button>
+                </>
+              ) : (
+                <div className="h-48 bg-surface-secondary rounded-card border border-dashed border-border flex flex-col items-center justify-center text-center p-4">
+                  <MapPin size={32} className="text-content-placeholder mb-2 opacity-50" />
+                  <p className="text-content-secondary text-sm font-medium">Lokasi Belum Diatur</p>
+                  <p className="text-content-placeholder text-xs mt-1">Toko ini belum menyematkan titik lokasi di peta.</p>
+                </div>
+              )}
             </section>
 
             {/* Delivery Info Card */}
@@ -233,21 +247,21 @@ export default function UMKMDetailPage() {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between border-b border-border/50 pb-2">
                     <span className="text-content-secondary">Jangkauan Max:</span>
-                    <span className="font-bold text-content-primary">{umkm.delivery_settings.max_radius_km} KM</span>
+                    <span className="font-bold text-content-primary">{deliverySettings.max_radius_km} KM</span>
                   </div>
                   <div className="flex justify-between border-b border-border/50 pb-2">
                     <span className="text-content-secondary">Tarif:</span>
                     <span className="font-extrabold text-primary-500">
-                      {umkm.delivery_settings.fee_type === 'free' 
+                      {deliverySettings.fee_type === 'free' 
                         ? 'Gratis' 
-                        : umkm.delivery_settings.fee_type === 'flat'
-                        ? formatRupiah(umkm.delivery_settings.flat_fee)
-                        : `${formatRupiah(umkm.delivery_settings.per_km_fee)} / KM`}
+                        : deliverySettings.fee_type === 'flat'
+                        ? formatRupiah(deliverySettings.flat_fee)
+                        : `${formatRupiah(deliverySettings.per_km_fee)} / KM`}
                     </span>
                   </div>
-                  {umkm.delivery_settings.free_delivery_min_order > 0 && (
+                  {deliverySettings.free_delivery_min_order > 0 && (
                     <div className="mt-3 p-2 bg-primary-500/10 rounded-badge border border-primary-500/20 text-primary-600 text-[11px] font-bold flex items-center gap-1.5 justify-center">
-                      <Gift size={12} /> Gratis ongkir minimal belanja {formatRupiah(umkm.delivery_settings.free_delivery_min_order)}
+                      <Gift size={12} /> Gratis ongkir minimal belanja {formatRupiah(deliverySettings.free_delivery_min_order)}
                     </div>
                   )}
                 </div>

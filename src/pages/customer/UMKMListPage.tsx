@@ -85,12 +85,16 @@ export default function UMKMListPage() {
         const ratings = u.reviews.map(r => r.rating);
         const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
         
+        const settings = Array.isArray(u.delivery_settings) 
+          ? u.delivery_settings[0] 
+          : u.delivery_settings;
+
         return {
           ...u,
           avg_rating: avgRating,
           review_count: ratings.length,
-          has_delivery: u.delivery_settings?.is_active || false,
-          is_free_delivery: (u.delivery_settings?.free_delivery_min_order || 0) > 0,
+          has_delivery: settings?.is_active || false,
+          is_free_delivery: (settings?.free_delivery_min_order || 0) > 0,
           is_unggulan: ((u as any).subscriptions || []).some(
             (s: any) => s.status === 'active' && new Date(s.expires_at) > new Date()
           ),
