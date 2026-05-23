@@ -246,12 +246,12 @@ export default function OrderManagementPage() {
                       {order.status}
                     </Badge>
                   </div>
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <h3 className="font-bold text-content-primary">{order.customer?.full_name}</h3>
+                  <div className="flex justify-between items-end gap-2">
+                    <div className="min-w-0 pr-2">
+                      <h3 className="font-bold text-content-primary line-clamp-1">{order.customer?.full_name}</h3>
                       <p className="text-[10px] text-content-secondary mt-1">{formatDate(order.created_at)}</p>
                     </div>
-                    <p className="font-black text-primary-500">{formatRupiah(order.total)}</p>
+                    <p className="font-black text-primary-500 whitespace-nowrap shrink-0">{formatRupiah(order.total)}</p>
                   </div>
                 </div>
 
@@ -263,15 +263,19 @@ export default function OrderManagementPage() {
                       <div className="space-y-2">
                         <p className="text-[10px] font-black uppercase tracking-widest text-content-placeholder">Item Pesanan</p>
                         {order.items?.map((item: any) => (
-                          <div key={item.id} className="flex justify-between text-sm">
-                            <span className="text-content-secondary"><span className="font-bold">{item.quantity}x</span> {item.product_name}</span>
-                            <span className="font-medium text-content-primary">{formatRupiah(item.product_price * item.quantity)}</span>
+                          <div key={item.id} className="flex justify-between text-sm gap-2">
+                            <span className="text-content-secondary line-clamp-2 flex-1">
+                              <span className="font-bold whitespace-nowrap">{item.quantity}x</span> {item.product_name}
+                            </span>
+                            <span className="font-medium text-content-primary whitespace-nowrap shrink-0">
+                              {formatRupiah(item.product_price * item.quantity)}
+                            </span>
                           </div>
                         ))}
                       </div>
 
                       {/* Info */}
-                      <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border/50">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/50">
                         <div>
                           <p className="text-[10px] font-black uppercase tracking-widest text-content-placeholder">Alamat</p>
                           <p className="text-xs text-content-secondary mt-1">{order.delivery_address || 'Ambil di Tempat'}</p>
@@ -283,7 +287,7 @@ export default function OrderManagementPage() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex gap-2 pt-4">
+                      <div className="flex flex-col sm:flex-row gap-2 pt-4">
                         {order.status === 'pending' && (
                           <>
                             <Button 
@@ -351,7 +355,7 @@ export default function OrderManagementPage() {
 
                           {/* Foto Ulasan */}
                           {orderReview.review_photos?.length > 0 && (
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
                               {orderReview.review_photos
                                 .sort((a: any, b: any) => a.sort_order - b.sort_order)
                                 .map((photo: any, i: number) => (

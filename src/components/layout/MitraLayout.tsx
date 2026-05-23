@@ -23,7 +23,7 @@ export default function MitraLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-primary text-content-primary flex pb-20 md:pb-0">
+    <div className="min-h-screen w-full overflow-x-hidden bg-surface-primary text-content-primary flex pb-20 md:pb-0">
       {/* Sidebar (Desktop) */}
       <aside className="hidden md:flex md:flex-col md:w-60 bg-surface-card border-r border-border p-4 gap-2 shrink-0">
         
@@ -81,13 +81,13 @@ export default function MitraLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-5xl mx-auto px-4 py-6 md:px-8">
+      <main className="flex-1 min-w-0 w-full max-w-5xl mx-auto px-4 py-6 md:px-8">
         <Outlet />
       </main>
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-card border-t border-border z-40">
-        <div className="flex justify-around items-center h-16 pb-safe-bottom px-1">
+        <div className="flex items-center h-16 pb-safe-bottom px-2 overflow-x-auto scrollbar-hide gap-1 sm:justify-around">
           {sidenavItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -95,7 +95,7 @@ export default function MitraLayout() {
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `flex flex-col items-center gap-0.5 px-1 py-1 transition-colors ${
+                  `flex flex-col items-center justify-center gap-1 w-14 shrink-0 transition-colors ${
                     isActive ? 'text-primary-500' : 'text-content-secondary'
                   }`
                 }
@@ -112,7 +112,7 @@ export default function MitraLayout() {
           <NavLink
             to="/katalog"
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 px-1 py-1 transition-colors ${
+              `flex flex-col items-center justify-center gap-1 w-14 shrink-0 transition-colors ${
                 isActive ? 'text-primary-500' : 'text-content-secondary'
               }`
             }
