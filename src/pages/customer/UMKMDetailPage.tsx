@@ -115,6 +115,8 @@ export default function UMKMDetailPage() {
     );
   }
 
+  const userLocation = useLocationStore((s) => s.userLocation);
+
   if (!umkm) return null;
 
   const ratings = umkm.reviews?.map((r: any) => r.rating) || [];
@@ -123,8 +125,6 @@ export default function UMKMDetailPage() {
     ? umkm.delivery_settings[0] 
     : umkm.delivery_settings;
   const isDeliveryActive = deliverySettings?.is_active;
-
-  const userLocation = useLocationStore((s) => s.userLocation);
   let distanceText = null;
   if (userLocation && umkm.latitude && umkm.longitude) {
     const dist = calculateDistance(umkm.latitude, umkm.longitude, userLocation.lat, userLocation.lng);
