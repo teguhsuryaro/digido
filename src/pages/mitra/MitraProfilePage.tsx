@@ -10,6 +10,7 @@ import Skeleton from '@/components/ui/Skeleton';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
+import SettingsTabs from '@/components/mitra/SettingsTabs';
 
 interface UMKMData {
   id: string;
@@ -171,9 +172,11 @@ export default function MitraProfilePage() {
     <PageTransition>
       <div className="max-w-4xl mx-auto space-y-8 pb-20 md:pb-8">
         <header>
-          <h1 className="text-2xl font-bold text-content-primary">Profil Toko</h1>
-          <p className="text-content-secondary text-sm mt-1">Kelola informasi toko Anda yang tampil di katalog.</p>
+          <h1 className="text-2xl font-black text-content-primary">Pengaturan Toko</h1>
+          <p className="text-sm text-content-secondary mt-1">Kelola semua pengaturan UMKM Anda di sini.</p>
         </header>
+
+        <SettingsTabs />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Kolom Kiri: Foto Profil & Paket */}

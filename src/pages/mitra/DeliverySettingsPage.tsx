@@ -9,6 +9,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Skeleton from '@/components/ui/Skeleton';
+import SettingsTabs from '@/components/mitra/SettingsTabs';
 
 export default function DeliverySettingsPage() {
   const navigate = useNavigate();
@@ -134,9 +135,11 @@ export default function DeliverySettingsPage() {
       <div className="max-w-2xl mx-auto space-y-8 pb-20 md:pb-8">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-black text-content-primary">Pengaturan Delivery</h1>
-          <p className="text-sm text-content-secondary mt-1">Atur jangkauan pengiriman dan skema tarif untuk pelanggan.</p>
+          <h1 className="text-2xl font-black text-content-primary">Pengaturan Toko</h1>
+          <p className="text-sm text-content-secondary mt-1">Kelola semua pengaturan UMKM Anda di sini.</p>
         </div>
+
+        <SettingsTabs />
 
         {noLocation && (
           <div className="bg-amber-50 border border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/30 p-4 rounded-card flex items-start gap-3">

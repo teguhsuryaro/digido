@@ -21,7 +21,7 @@ import {
   HomePage, UMKMListPage, UMKMDetailPage, SearchResultsPage,
   CartPage, CheckoutPage, WalletPage,
   OrdersPage, OrderDetailPage, ProfilePage,
-  InventarisPage, OrderManagementPage, DeliverySettingsPage,
+  MitraDashboardPage, InventarisPage, OrderManagementPage, DeliverySettingsPage,
   OperasionalPage, FinansialPage, LiveChatPage, MitraProfilePage,
   SubscriptionPage, UMKMReviewsPage,
   SuperadminDashboard, SuperadminMitraApproval, SuperadminReports,
@@ -186,14 +186,14 @@ export default function App() {
             {/* ===== MITRA ROUTES (Role: mitra only) ===== */}
             <Route element={<RoleGuard allowedRoles={['mitra']} redirectTo="/" />}>
               <Route path="/mitra" element={<MitraLayout />}>
-                <Route index element={<InventarisPage />} />
+                <Route index element={<MitraDashboardPage />} />
                 <Route path="inventaris" element={<InventarisPage />} />
-                <Route path="profil" element={<MitraProfilePage />} />
-                <Route path="paket" element={<SubscriptionPage />} />
                 <Route path="pesanan" element={<OrderManagementPage />} />
-                <Route path="pengiriman" element={<DeliverySettingsPage />} />
-                <Route path="operasional" element={<OperasionalPage />} />
-                <Route path="finansial" element={<FinansialPage />} />
+                <Route path="pengaturan" element={<OperasionalPage />} />
+                <Route path="pengaturan/profil" element={<MitraProfilePage />} />
+                <Route path="pengaturan/paket" element={<SubscriptionPage />} />
+                <Route path="pengaturan/pengiriman" element={<DeliverySettingsPage />} />
+                <Route path="pengaturan/finansial" element={<FinansialPage />} />
                 <Route path="chat" element={<LiveChatPage />} />
               </Route>
             </Route>

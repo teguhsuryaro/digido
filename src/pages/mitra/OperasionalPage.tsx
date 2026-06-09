@@ -8,6 +8,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Skeleton from '@/components/ui/Skeleton';
 import LocationPicker from '@/components/LocationPicker';
+import SettingsTabs from '@/components/mitra/SettingsTabs';
 
 const DAYS = [
   { key: 'monday', label: 'Senin' },
@@ -136,9 +137,11 @@ export default function OperasionalPage() {
       <div className="max-w-4xl mx-auto space-y-8 pb-20 md:pb-8">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-black text-content-primary">Operasional Toko</h1>
-          <p className="text-sm text-content-secondary mt-1">Kelola jadwal buka, status darurat, dan lokasi jualan Anda.</p>
+          <h1 className="text-2xl font-black text-content-primary">Pengaturan Toko</h1>
+          <p className="text-sm text-content-secondary mt-1">Kelola semua pengaturan UMKM Anda di sini.</p>
         </div>
+
+        <SettingsTabs />
 
         {/* Emergency Override */}
         <section className="space-y-4">

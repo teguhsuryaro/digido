@@ -1,17 +1,15 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { Package, ClipboardList, Truck, Settings, CreditCard, MessageCircle, ShoppingBag, LogOut, Store, User } from 'lucide-react';
+import { Package, ClipboardList, Settings, MessageCircle, ShoppingBag, LogOut, Store, User, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { handleLogout } from '@/utils/logout';
 import Button from '@/components/ui/Button';
 
 const sidenavItems = [
-  { to: '/mitra/inventaris', icon: Package, label: 'Inventaris' },
+  { to: '/mitra', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/mitra/pesanan', icon: ClipboardList, label: 'Pesanan' },
-  { to: '/mitra/pengiriman', icon: Truck, label: 'Pengiriman' },
-  { to: '/mitra/operasional', icon: Settings, label: 'Operasional' },
-  { to: '/mitra/finansial', icon: CreditCard, label: 'Finansial' },
+  { to: '/mitra/inventaris', icon: Package, label: 'Katalog' },
+  { to: '/mitra/pengaturan', icon: Settings, label: 'Pengaturan' },
   { to: '/mitra/chat', icon: MessageCircle, label: 'Live Chat' },
-  { to: '/mitra/profil', icon: User, label: 'Profil' },
 ];
 
 export default function MitraLayout() {
@@ -46,6 +44,7 @@ export default function MitraLayout() {
               <NavLink
                 key={item.to}
                 to={item.to}
+                end={item.to === '/mitra'}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-button text-sm font-medium transition-colors ${
                     isActive
@@ -94,6 +93,7 @@ export default function MitraLayout() {
               <NavLink
                 key={item.to}
                 to={item.to}
+                end={item.to === '/mitra'}
                 className={({ isActive }) =>
                   `flex flex-col items-center justify-center gap-1 w-14 shrink-0 transition-colors ${
                     isActive ? 'text-primary-500' : 'text-content-secondary'

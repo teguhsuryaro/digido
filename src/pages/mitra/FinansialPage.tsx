@@ -15,6 +15,7 @@ import {
 import PageTransition from '@/components/ui/PageTransition';
 import Card from '@/components/ui/Card';
 import Skeleton from '@/components/ui/Skeleton';
+import SettingsTabs from '@/components/mitra/SettingsTabs';
 
 export default function FinansialPage() {
   const user = useAuthStore((s) => s.user);
@@ -116,16 +117,11 @@ export default function FinansialPage() {
       <div className="space-y-8 pb-20 md:pb-8">
         {/* Header */}
         <div>
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-extrabold text-content-primary">Laporan Finansial</h1>
-            <span className="px-3 py-1 bg-primary-500/10 text-primary-600 dark:text-primary-400 text-[10px] font-bold uppercase tracking-widest rounded-full border border-primary-500/20">
-              Prototype Mode
-            </span>
-          </div>
-          <p className="text-sm text-content-secondary mt-1">
-            Pantau pertumbuhan pendapatan toko <span className="font-bold">{umkm.name}</span>.
-          </p>
+          <h1 className="text-2xl font-black text-content-primary">Pengaturan Toko</h1>
+          <p className="text-sm text-content-secondary mt-1">Kelola semua pengaturan UMKM Anda di sini.</p>
         </div>
+
+        <SettingsTabs />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -9,6 +9,7 @@ import Skeleton from '@/components/ui/Skeleton';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import QRISDisplay from '@/components/QRISDisplay';
+import SettingsTabs from '@/components/mitra/SettingsTabs';
 
 interface Plan {
   id: string;
@@ -209,13 +210,11 @@ export default function SubscriptionPage() {
     <PageTransition>
       <div className="max-w-3xl mx-auto space-y-8 pb-20 md:pb-8">
         <header>
-          <h1 className="text-2xl font-bold text-content-primary flex items-center gap-2">
-            <Crown size={24} className="text-yellow-500" /> Paket Premium
-          </h1>
-          <p className="text-content-secondary text-sm mt-1">
-            Tingkatkan visibilitas toko Anda di DigiDO dengan paket premium.
-          </p>
+          <h1 className="text-2xl font-black text-content-primary">Pengaturan Toko</h1>
+          <p className="text-sm text-content-secondary mt-1">Kelola semua pengaturan UMKM Anda di sini.</p>
         </header>
+
+        <SettingsTabs />
 
         {/* Status Paket Aktif */}
         <Card className={`p-4 ${activeSub ? 'border-2 border-yellow-500/30 bg-yellow-500/5' : ''}`}>

@@ -196,31 +196,40 @@ export default function ProductForm({ umkmId, initialData, onSuccess, onCancel }
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Input
-          label="Harga (Rp)"
-          type="number"
-          placeholder="0"
-          {...register('price', { valueAsNumber: true })}
-          error={errors.price?.message as any}
-        />
-        <Input
-          label="Diskon (%)"
-          type="number"
-          placeholder="0"
-          {...register('discount_percentage', { 
-            setValueAs: (v) => (v === "" || v === null || Number.isNaN(Number(v))) ? 0 : parseInt(v, 10)
-          })}
-          error={errors.discount_percentage?.message as any}
-        />
-        <Input
-          label="Stok Harian"
-          type="number"
-          placeholder="Tanpa batas"
-          {...register('daily_stock', { 
-            setValueAs: (v) => (v === "" || v === null || Number.isNaN(Number(v))) ? null : parseInt(v, 10)
-          })}
-          error={errors.daily_stock?.message as any}
-        />
+        <div>
+          <Input
+            label="Harga (Rp)"
+            type="number"
+            placeholder="0"
+            {...register('price', { valueAsNumber: true })}
+            error={errors.price?.message as any}
+          />
+          <p className="text-[10px] text-content-placeholder mt-1 px-1">Harga jual asli produk.</p>
+        </div>
+        <div>
+          <Input
+            label="Diskon (%)"
+            type="number"
+            placeholder="0"
+            {...register('discount_percentage', { 
+              setValueAs: (v) => (v === "" || v === null || Number.isNaN(Number(v))) ? 0 : parseInt(v, 10)
+            })}
+            error={errors.discount_percentage?.message as any}
+          />
+          <p className="text-[10px] text-content-placeholder mt-1 px-1">0 = tanpa diskon. Cth: 10 untuk 10%.</p>
+        </div>
+        <div>
+          <Input
+            label="Stok Harian"
+            type="number"
+            placeholder="Tanpa batas"
+            {...register('daily_stock', { 
+              setValueAs: (v) => (v === "" || v === null || Number.isNaN(Number(v))) ? null : parseInt(v, 10)
+            })}
+            error={errors.daily_stock?.message as any}
+          />
+          <p className="text-[10px] text-content-placeholder mt-1 px-1">Kosongkan jika stok tidak terbatas.</p>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 pt-4">
