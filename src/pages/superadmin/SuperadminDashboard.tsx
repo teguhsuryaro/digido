@@ -1,6 +1,57 @@
-import { LayoutDashboard } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { LayoutDashboard, Users, Store, AlertTriangle, CheckCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import Skeleton from '@/components/ui/Skeleton';
+import Card from '@/components/ui/Card';
 
 export default function SuperadminDashboard() {
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalMitra: 0,
+    openReports: 0,
+    completedOrders: 0,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const { count: totalUsers } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 'pelanggan');
+
+        const { count: totalMitra } = await supabase
+          .from('umkm')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true);
+
+        const { count: openReports } = await supabase
+          .from('reports')
+          .select('*', { count: 'exact', head: true })
+          .in('status', ['open', 'reviewed']);
+
+        const { count: completedOrders } = await supabase
+          .from('orders')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'completed');
+
+        setStats({
+          totalUsers: totalUsers || 0,
+          totalMitra: totalMitra || 0,
+          openReports: openReports || 0,
+          completedOrders: completedOrders || 0,
+        });
+      } catch (err) {
+        console.error('Error fetching superadmin stats:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
@@ -8,25 +59,42 @@ export default function SuperadminDashboard() {
         <h1 className="text-2xl font-bold text-content-primary">Dashboard Utama</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Placeholder Statistic Cards */}
-        <div className="p-6 bg-surface-card rounded-2xl border border-border shadow-sm flex flex-col gap-2">
-          <p className="text-sm font-medium text-content-secondary">Total Pengguna</p>
-          <p className="text-3xl font-extrabold text-content-primary">-</p>
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 w-full rounded-card" />)}
         </div>
-        <div className="p-6 bg-surface-card rounded-2xl border border-border shadow-sm flex flex-col gap-2">
-          <p className="text-sm font-medium text-content-secondary">Mitra Aktif</p>
-          <p className="text-3xl font-extrabold text-content-primary">-</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="p-6 flex flex-col gap-2 border-l-4 border-l-blue-500">
+            <div className="flex justify-between items-start">
+              <p className="text-sm font-medium text-content-secondary">Total Pelanggan</p>
+              <Users size={20} className="text-blue-500" />
+            </div>
+            <p className="text-3xl font-extrabold text-content-primary">{stats.totalUsers}</p>
+          </Card>
+          <Card className="p-6 flex flex-col gap-2 border-l-4 border-l-green-500">
+            <div className="flex justify-between items-start">
+              <p className="text-sm font-medium text-content-secondary">Mitra Aktif</p>
+              <Store size={20} className="text-green-500" />
+            </div>
+            <p className="text-3xl font-extrabold text-content-primary">{stats.totalMitra}</p>
+          </Card>
+          <Card className="p-6 flex flex-col gap-2 border-l-4 border-l-red-500">
+            <div className="flex justify-between items-start">
+              <p className="text-sm font-medium text-content-secondary">Laporan Belum Selesai</p>
+              <AlertTriangle size={20} className="text-red-500" />
+            </div>
+            <p className="text-3xl font-extrabold text-red-500">{stats.openReports}</p>
+          </Card>
+          <Card className="p-6 flex flex-col gap-2 border-l-4 border-l-purple-500">
+            <div className="flex justify-between items-start">
+              <p className="text-sm font-medium text-content-secondary">Transaksi Selesai</p>
+              <CheckCircle size={20} className="text-purple-500" />
+            </div>
+            <p className="text-3xl font-extrabold text-content-primary">{stats.completedOrders}</p>
+          </Card>
         </div>
-        <div className="p-6 bg-surface-card rounded-2xl border border-border shadow-sm flex flex-col gap-2">
-          <p className="text-sm font-medium text-content-secondary">Laporan Terbuka</p>
-          <p className="text-3xl font-extrabold text-red-500">-</p>
-        </div>
-      </div>
-
-      <div className="p-6 bg-surface-card rounded-2xl border border-border shadow-sm mt-8">
-        <p className="text-content-secondary text-center py-10">Data statistik belum tersedia. Akan diimplementasikan lebih lanjut.</p>
-      </div>
+      )}
     </div>
   );
 }
