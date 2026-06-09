@@ -22,35 +22,35 @@ export default function MitraDashboardPage() {
       if (!user) return;
       try {
         // 1. Get UMKM ID
-        const { data: umkm } = await supabase
+        const { data: umkm } = (await supabase
           .from('umkm')
           .select('id')
           .eq('owner_id', user.id)
-          .single();
+          .single()) as any;
 
         if (!umkm) return;
 
         // 2. Get Products Count
-        const { data: products } = await supabase
+        const { data: products } = (await supabase
           .from('products')
           .select('id, daily_stock, is_available')
-          .eq('umkm_id', umkm.id);
+          .eq('umkm_id', umkm.id)) as any;
 
         const totalProducts = products?.length || 0;
-        const lowStockProducts = products?.filter(p => p.is_available && p.daily_stock !== null && p.daily_stock <= 5).length || 0;
+        const lowStockProducts = products?.filter((p: any) => p.is_available && p.daily_stock !== null && p.daily_stock <= 5).length || 0;
 
         // 3. Get Today's Orders
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const { data: orders } = await supabase
+        const { data: orders } = (await supabase
           .from('orders')
           .select('id, total_amount, status')
           .eq('umkm_id', umkm.id)
-          .gte('created_at', today.toISOString());
+          .gte('created_at', today.toISOString())) as any;
 
         const todayOrders = orders?.length || 0;
-        const todayRevenue = orders?.filter(o => o.status === 'completed' || o.status === 'accepted' || o.status === 'ready').reduce((sum, o) => sum + o.total_amount, 0) || 0;
+        const todayRevenue = orders?.filter((o: any) => o.status === 'completed' || o.status === 'accepted' || o.status === 'ready').reduce((sum: number, o: any) => sum + o.total_amount, 0) || 0;
 
         setStats({
           todayOrders,

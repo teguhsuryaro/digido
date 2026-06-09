@@ -109,7 +109,7 @@ export default function UMKMListPage() {
 
       // Filter by Delivery/FreeOngkir (JS side)
       if (filterDelivery) processed = processed.filter((u: any) => u.has_delivery);
-      if (filterFreeOngkir) processed = processed.filter((u: any) => u.is_free_delivery);
+      if (filterFreeOngkirState) processed = processed.filter((u: any) => u.is_free_delivery);
 
       // Sort by Rating or Distance if needed (JS side)
       if (sortBy === 'rating') {

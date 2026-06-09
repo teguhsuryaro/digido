@@ -3,7 +3,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from '@/components/ui/Toast';
 
 interface RoleGuardProps {
-  allowedRoles: Array<'pelanggan' | 'mitra'>;
+  allowedRoles: Array<'pelanggan' | 'mitra' | 'superadmin'>;
   redirectTo?: string;
 }
 
@@ -17,7 +17,7 @@ export default function RoleGuard({
 }: RoleGuardProps) {
   const userRole = useAuthStore((s) => s.getUserRole());
 
-  if (!allowedRoles.includes(userRole as 'pelanggan' | 'mitra')) {
+  if (!allowedRoles.includes(userRole as 'pelanggan' | 'mitra' | 'superadmin')) {
     toast.warning('Anda tidak memiliki akses ke halaman ini.');
     return <Navigate to={redirectTo} replace />;
   }

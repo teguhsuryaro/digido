@@ -29,13 +29,13 @@ export default function SuperadminReports() {
   const fetchReports = async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase
+      const { data, error } = (await supabase
         .from('reports')
         .select(`
           *,
           profiles:reporter_id (full_name)
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })) as any;
 
       if (error) throw error;
       setReports(data || []);
