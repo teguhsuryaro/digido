@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import UMKMCard from '@/components/UMKMCard';
 import { useLocationStore } from '@/store/useLocationStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { calculateDistance } from '@/utils/distance';
 
 interface UMKMData {
@@ -35,9 +36,10 @@ export default function UMKMListPage() {
   const [sortBy, setSortBy] = useState<SortOption>('name_asc');
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterDelivery, setFilterDelivery] = useState(false);
-  const [filterFreeOngkir, setFilterFreeOngkir] = useState(false);
+  const [filterFreeOngkirState, setFilterFreeOngkir] = useState(false);
   const userLocation = useLocationStore((s) => s.userLocation);
   const setUserLocation = useLocationStore((s) => s.setUserLocation);
+  const user = useAuthStore((s) => s.user);
 
   const PAGE_SIZE = 10;
 
@@ -69,6 +71,10 @@ export default function UMKMListPage() {
           subscriptions(id, status, expires_at)
         `)
         .eq('is_active', true);
+
+      if (user) {
+        query = query.neq('owner_id', user.id);
+      }
 
       if (filterOpen) query = query.eq('is_open', true);
 
@@ -130,7 +136,7 @@ export default function UMKMListPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [filterOpen, filterDelivery, filterFreeOngkir, sortBy, userLocation]);
+  }, [filterOpen, filterDelivery, filterFreeOngkirState, sortBy, userLocation, user]);
 
   useEffect(() => {
     setPage(0);
@@ -178,8 +184,8 @@ export default function UMKMListPage() {
             label="Delivery"
           />
           <FilterButton 
-            active={filterFreeOngkir} 
-            onClick={() => setFilterFreeOngkir(!filterFreeOngkir)}
+            active={filterFreeOngkirState} 
+            onClick={() => setFilterFreeOngkir(!filterFreeOngkirState)}
             label="Gratis Ongkir"
           />
         </div>

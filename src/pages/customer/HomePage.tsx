@@ -6,6 +6,7 @@ import PageTransition from '@/components/ui/PageTransition';
 import Skeleton from '@/components/ui/Skeleton';
 import Button from '@/components/ui/Button';
 import UMKMCard from '@/components/UMKMCard';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface UMKM {
   id: string;
@@ -26,11 +27,12 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [featuredUMKM, setFeaturedUMKM] = useState<UMKM[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
     const fetchFeatured = async () => {
       const now = new Date().toISOString();
-      const { data } = await supabase
+      let query = supabase
         .from('umkm')
         .select(`
           id, name, business_type, description, is_open, photo_url, latitude, longitude,
@@ -42,6 +44,12 @@ export default function HomePage() {
         .eq('subscriptions.status', 'active')
         .gte('subscriptions.expires_at', now)
         .limit(6);
+        
+      if (user) {
+        query = query.neq('owner_id', user.id);
+      }
+      
+      const { data } = await query;
       
       const processed = ((data as any) || []).map((u: any) => {
         const ratings = u.reviews?.map((r: any) => r.rating) || [];
@@ -74,7 +82,7 @@ export default function HomePage() {
       setIsLoading(false);
     };
     fetchFeatured();
-  }, []);
+  }, [user]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

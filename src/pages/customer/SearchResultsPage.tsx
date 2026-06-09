@@ -7,6 +7,7 @@ import PageTransition from '@/components/ui/PageTransition';
 import Skeleton from '@/components/ui/Skeleton';
 import UMKMCard from '@/components/UMKMCard';
 import ProductCard from '@/components/ProductCard';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function SearchResultsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,6 +20,7 @@ export default function SearchResultsPage() {
   const [umkms, setUmkms] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const user = useAuthStore((s) => s.user);
 
   // Update URL saat debounced query berubah
   useEffect(() => {
@@ -41,18 +43,30 @@ export default function SearchResultsPage() {
       setIsLoading(true);
       try {
         // 1. Search UMKM
-        const { data: umkmData } = await supabase
+        let umkmQuery = supabase
           .from('umkm')
           .select('*, reviews(rating), delivery_settings(*), subscriptions(id, status, expires_at)')
           .ilike('name', `%${query}%`)
           .limit(10);
+          
+        if (user) {
+          umkmQuery = umkmQuery.neq('owner_id', user.id);
+        }
+
+        const { data: umkmData } = await umkmQuery;
 
         // 2. Search Products (with UMKM name for ProductCard)
-        const { data: productData } = await supabase
+        let productQuery = supabase
           .from('products')
-          .select('*, umkm(name)')
+          .select('*, umkm!inner(name, owner_id)')
           .ilike('name', `%${query}%`)
           .limit(20);
+          
+        if (user) {
+          productQuery = productQuery.neq('umkm.owner_id', user.id);
+        }
+
+        const { data: productData } = await productQuery;
 
         // Process UMKM Data (Rating calculation)
         const processedUmkms = ((umkmData as any) || []).map((u: any) => {
@@ -85,7 +99,7 @@ export default function SearchResultsPage() {
     };
 
     fetchResults();
-  }, [query]);
+  }, [query, user]);
 
   const hasResults = umkms.length > 0 || products.length > 0;
 
