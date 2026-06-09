@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, Navigate } from 'react-router-dom';
 import { Home, ShoppingBag, ClipboardList, User } from 'lucide-react';
 import Navbar from './Navbar';
 import { useLocationStore } from '@/store/useLocationStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const navItems = [
   { to: '/', icon: Home, label: 'Beranda' },
@@ -14,6 +15,11 @@ const navItems = [
 export default function CustomerLayout() {
   const userLocation = useLocationStore((s) => s.userLocation);
   const setUserLocation = useLocationStore((s) => s.setUserLocation);
+  const profile = useAuthStore((s) => s.profile);
+
+  if (profile?.role === 'superadmin') {
+    return <Navigate to="/superadmin" replace />;
+  }
 
   useEffect(() => {
     if (navigator.geolocation && !userLocation) {

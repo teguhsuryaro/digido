@@ -56,7 +56,9 @@ export default function LoginPage() {
           toast.success(`Selamat datang kembali, ${(profile as any).full_name}!`);
 
           // Redirect berdasarkan role
-          if ((profile as any).role === 'mitra') {
+          if ((profile as any).role === 'superadmin') {
+            navigate('/superadmin', { replace: true });
+          } else if ((profile as any).role === 'mitra') {
             navigate('/mitra', { replace: true });
           } else {
             navigate(from, { replace: true });

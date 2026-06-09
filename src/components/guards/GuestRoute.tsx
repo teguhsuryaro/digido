@@ -21,6 +21,9 @@ export default function GuestRoute() {
   }
 
   if (isAuthenticated) {
+    const role = useAuthStore.getState().profile?.role;
+    if (role === 'superadmin') return <Navigate to="/superadmin" replace />;
+    if (role === 'mitra') return <Navigate to="/mitra" replace />;
     return <Navigate to="/" replace />;
   }
 

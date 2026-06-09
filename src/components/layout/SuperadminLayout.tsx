@@ -86,7 +86,7 @@ export default function SuperadminLayout() {
                 to={item.to}
                 end={item.to === '/superadmin'}
                 className={({ isActive }) =>
-                  `flex flex-col items-center justify-center gap-1 w-20 shrink-0 transition-colors ${
+                  `flex flex-col items-center justify-center gap-1 w-16 shrink-0 transition-colors ${
                     isActive ? 'text-red-500' : 'text-content-secondary'
                   }`
                 }
@@ -100,6 +100,13 @@ export default function SuperadminLayout() {
               </NavLink>
             );
           })}
+          <button
+            onClick={onLogout}
+            className="flex flex-col items-center justify-center gap-1 w-16 shrink-0 transition-colors text-content-secondary hover:text-red-500"
+          >
+            <LogOut size={20} strokeWidth={1.5} />
+            <span className="text-[10px] font-bold">Keluar</span>
+          </button>
         </div>
       </nav>
     </div>
