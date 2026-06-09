@@ -1,6 +1,8 @@
 import { X, Share2, Flag, Bookmark, Package } from 'lucide-react';
 import StarRating from '@/components/StarRating';
 import { formatRupiah } from '@/utils/format';
+import { useState } from 'react';
+import ReportModal from '@/components/ReportModal';
 
 interface ProductDetailModalProps {
   product: {
@@ -23,6 +25,8 @@ export default function ProductDetailModal({
   ratingCount,
   onClose,
 }: ProductDetailModalProps) {
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
   return (
     <>
       {/* Backdrop */}
@@ -107,9 +111,9 @@ export default function ProductDetailModal({
                 <Share2 size={14} /> Bagikan
               </button>
               <button
-                disabled
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-button bg-surface-secondary text-content-placeholder text-sm font-medium cursor-not-allowed opacity-60"
-                title="Fitur ini belum tersedia"
+                onClick={() => setIsReportModalOpen(true)}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-button bg-surface-secondary text-content-secondary hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 text-sm font-medium transition-colors"
+                title="Laporkan Produk"
               >
                 <Flag size={14} /> Laporkan
               </button>
@@ -124,6 +128,16 @@ export default function ProductDetailModal({
           </div>
         </div>
       </div>
+
+      {/* Modal Laporan Produk */}
+      {isReportModalOpen && (
+        <ReportModal
+          targetType="product"
+          targetId={product.id}
+          targetName={product.name}
+          onClose={() => setIsReportModalOpen(false)}
+        />
+      )}
     </>
   );
 }

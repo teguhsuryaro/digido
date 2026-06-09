@@ -12,6 +12,7 @@ import ProductCard from '@/components/ProductCard';
 import MapView from '@/components/MapView';
 import ChatbotWidget from '@/components/chatbot/ChatbotWidget';
 import ProductDetailModal from '@/components/ProductDetailModal';
+import ReportModal from '@/components/ReportModal';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLocationStore } from '@/store/useLocationStore';
 import { calculateDistance, formatDistance } from '@/utils/distance';
@@ -39,6 +40,7 @@ export default function UMKMDetailPage() {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [productRatings, setProductRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const userLocation = useLocationStore((s) => s.userLocation);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -140,13 +142,21 @@ export default function UMKMDetailPage() {
               <h1 className="text-2xl sm:text-3xl font-extrabold text-content-primary leading-tight">{umkm.name}</h1>
               <p className="text-content-secondary mt-1 font-medium">{umkm.business_type}</p>
             </div>
-            <span className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-              umkm.is_open 
-                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-            }`}>
-              {umkm.is_open ? 'Buka' : 'Tutup'}
-            </span>
+            <div className="flex flex-col items-end gap-2">
+              <span className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                umkm.is_open 
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+              }`}>
+                {umkm.is_open ? 'Buka' : 'Tutup'}
+              </span>
+              <button 
+                onClick={() => setIsReportModalOpen(true)}
+                className="text-xs text-content-placeholder hover:text-red-500 transition-colors flex items-center gap-1 font-medium"
+              >
+                Laporkan Toko
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-4 mt-4 text-sm flex-wrap">
@@ -313,6 +323,16 @@ export default function UMKMDetailPage() {
           avgRating={productRatings[selectedProduct.id]?.avg || 0}
           ratingCount={productRatings[selectedProduct.id]?.count || 0}
           onClose={() => setSelectedProduct(null)}
+        />
+      )}
+
+      {/* Modal Laporan UMKM */}
+      {isReportModalOpen && (
+        <ReportModal
+          targetType="umkm"
+          targetId={umkm.id}
+          targetName={umkm.name}
+          onClose={() => setIsReportModalOpen(false)}
         />
       )}
     </PageTransition>
