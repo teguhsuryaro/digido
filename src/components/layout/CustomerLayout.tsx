@@ -17,10 +17,6 @@ export default function CustomerLayout() {
   const setUserLocation = useLocationStore((s) => s.setUserLocation);
   const profile = useAuthStore((s) => s.profile);
 
-  if (profile?.role === 'superadmin') {
-    return <Navigate to="/superadmin" replace />;
-  }
-
   useEffect(() => {
     if (navigator.geolocation && !userLocation) {
       navigator.geolocation.getCurrentPosition(
@@ -33,6 +29,10 @@ export default function CustomerLayout() {
       );
     }
   }, [userLocation, setUserLocation]);
+
+  if (profile?.role === 'superadmin') {
+    return <Navigate to="/superadmin" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-surface-primary text-content-primary pb-20 md:pb-0">
