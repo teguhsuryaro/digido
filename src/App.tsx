@@ -12,6 +12,7 @@ import GuestRoute from '@/components/guards/GuestRoute';
 // Layouts
 import CustomerLayout from '@/components/layout/CustomerLayout';
 import MitraLayout from '@/components/layout/MitraLayout';
+import SuperadminLayout from '@/components/layout/SuperadminLayout';
 import AuthLayout from '@/components/layout/AuthLayout';
 
 // Pages (lazy loaded)
@@ -23,6 +24,7 @@ import {
   InventarisPage, OrderManagementPage, DeliverySettingsPage,
   OperasionalPage, FinansialPage, LiveChatPage, MitraProfilePage,
   SubscriptionPage, UMKMReviewsPage,
+  SuperadminDashboard, SuperadminMitraApproval, SuperadminReports,
 } from '@/pages';
 
 import { useGlobalErrorHandler } from '@/hooks/useGlobalErrorHandler';
@@ -193,6 +195,15 @@ export default function App() {
                 <Route path="operasional" element={<OperasionalPage />} />
                 <Route path="finansial" element={<FinansialPage />} />
                 <Route path="chat" element={<LiveChatPage />} />
+              </Route>
+            </Route>
+
+            {/* ===== SUPERADMIN ROUTES (Role: superadmin only) ===== */}
+            <Route element={<RoleGuard allowedRoles={['superadmin']} redirectTo="/" />}>
+              <Route path="/superadmin" element={<SuperadminLayout />}>
+                <Route index element={<SuperadminDashboard />} />
+                <Route path="mitra" element={<SuperadminMitraApproval />} />
+                <Route path="laporan" element={<SuperadminReports />} />
               </Route>
             </Route>
           </Route>

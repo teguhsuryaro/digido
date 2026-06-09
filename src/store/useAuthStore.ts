@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { User, Session } from '@supabase/supabase-js';
 
-type UserRole = 'guest' | 'pelanggan' | 'mitra';
+type UserRole = 'guest' | 'pelanggan' | 'mitra' | 'superadmin';
 
 interface Profile {
   id: string;

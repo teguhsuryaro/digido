@@ -27,3 +27,8 @@ export const OperasionalPage = lazy(() => import('@/pages/mitra/OperasionalPage'
 export const FinansialPage = lazy(() => import('@/pages/mitra/FinansialPage'));
 export const LiveChatPage = lazy(() => import('@/pages/mitra/LiveChatPage'));
 export const SubscriptionPage = lazy(() => import('@/pages/mitra/SubscriptionPage'));
+
+// ===== SUPERADMIN =====
+export const SuperadminDashboard = lazy(() => import('@/pages/superadmin/SuperadminDashboard'));
+export const SuperadminMitraApproval = lazy(() => import('@/pages/superadmin/SuperadminMitraApproval'));
+export const SuperadminReports = lazy(() => import('@/pages/superadmin/SuperadminReports'));
