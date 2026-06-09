@@ -48,25 +48,36 @@ export default function App() {
     const initAuth = async () => {
       try {
         setLoading(true);
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (error) throw error;
 
         if (session?.user) {
-          setAuth(session.user, session);
-
           // Ambil profile dari database
           // Gunakan maybeSingle() agar tidak throw error jika profile belum ada
-          // (bisa terjadi jika trigger on_auth_user_created belum berjalan)
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .maybeSingle();
 
-          if (profile) setProfile(profile as any);
+          if (profileError) throw profileError;
+
+          if (profile) {
+            setAuth(session.user, session);
+            setProfile(profile as any);
+          } else {
+            console.warn('Profile tidak ditemukan untuk session berjalan. Membersihkan session...');
+            throw new Error('Profile not found');
+          }
+        } else {
+          useAuthStore.getState().logout();
         }
       } catch (err) {
-        // Jika ada error apapun, tetap lanjutkan (jangan stuck loading)
+        // Jika ada error apapun (misal token expired/invalid), bersihkan session
         console.error('Auth initialization error:', err);
+        useAuthStore.getState().logout();
+        await supabase.auth.signOut().catch(() => {});
       } finally {
         // Pastikan loading SELALU selesai, apapun yang terjadi
         setInitialized(true);
@@ -94,9 +105,9 @@ export default function App() {
 
             if (profileErr) {
               console.error('Profile fetch error on SIGNED_IN:', profileErr.message);
-            }
-
-            if (profile) {
+              useAuthStore.getState().logout();
+              await supabase.auth.signOut().catch(() => {});
+            } else if (profile) {
               setProfile(profile as any);
             } else {
               // Profil belum ada (trigger DB belum berjalan).
