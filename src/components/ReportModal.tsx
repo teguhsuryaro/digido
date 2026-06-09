@@ -63,7 +63,7 @@ export default function ReportModal({ targetType, targetId, targetName, onClose 
       {/* Modal */}
       <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
         <div
-          className="bg-surface-card rounded-card border border-border shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-300 relative"
+          className="bg-surface-card rounded-card border border-border shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-300 relative max-h-[90vh] flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -81,7 +81,7 @@ export default function ReportModal({ targetType, targetId, targetName, onClose 
           </div>
 
           {/* Body */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
             <div>
               <p className="text-sm font-medium text-content-secondary mb-1">
                 Melaporkan:

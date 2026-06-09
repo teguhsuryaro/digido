@@ -84,7 +84,7 @@ export default function UMKMCard({ umkm }: UMKMCardProps) {
         <div className="flex-1 min-w-0">
           {/* Title & Status */}
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-bold text-content-primary group-hover:text-primary-500 transition-colors truncate">
+            <h3 className="max-w-full font-bold text-content-primary group-hover:text-primary-500 transition-colors truncate">
               {umkm.name}
             </h3>
             {umkm.is_unggulan && (

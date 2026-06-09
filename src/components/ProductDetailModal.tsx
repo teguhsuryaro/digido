@@ -122,7 +122,7 @@ export default function ProductDetailModal({
             </div>
 
             {/* Tombol Dekoratif */}
-            <div className="flex gap-2 pt-3 border-t border-border">
+            <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t border-border">
               <button
                 disabled
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-button bg-surface-secondary text-content-placeholder text-sm font-medium cursor-not-allowed opacity-60"
