@@ -5,6 +5,7 @@ export const productSchema = z.object({
   description: z.string().nullable().optional(),
   price: z.number().min(0, 'Harga tidak boleh negatif'),
   daily_stock: z.number().min(0).nullable().optional(),
+  discount_percentage: z.number().min(0, 'Diskon tidak boleh negatif').max(100, 'Diskon maksimal 100%').nullable().optional(),
   image_url: z.string().nullable().optional(),
   is_available: z.boolean(),
 });

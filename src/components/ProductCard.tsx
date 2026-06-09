@@ -14,6 +14,7 @@ interface Product {
   image_url: string | null;
   is_available: boolean;
   daily_stock: number | null;
+  discount_percentage?: number | null;
 }
 
 interface ProductCardProps {
@@ -26,13 +27,18 @@ export default function ProductCard({ product, umkmName }: ProductCardProps) {
   
   const isOutOfStock = !product.is_available || (product.daily_stock !== null && product.daily_stock <= 0);
 
+  const hasDiscount = !!product.discount_percentage && product.discount_percentage > 0;
+  const finalPrice = hasDiscount
+    ? product.price - (product.price * (product.discount_percentage! / 100))
+    : product.price;
+
   const handleAddToCart = (e?: React.MouseEvent) => {
     e?.stopPropagation();  // Mencegah bubble ke parent (yang membuka modal)
     const success = addItem(
       {
         id: product.id,
         name: product.name,
-        price: product.price,
+        price: finalPrice, // Save final discounted price to cart
         quantity: 1,
         image_url: product.image_url,
         max_daily_stock: product.daily_stock,
@@ -72,6 +78,11 @@ export default function ProductCard({ product, umkmName }: ProductCardProps) {
             </span>
           </div>
         )}
+        {hasDiscount && !isOutOfStock && (
+          <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+            Diskon {product.discount_percentage}%
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -82,9 +93,16 @@ export default function ProductCard({ product, umkmName }: ProductCardProps) {
         </p>
         
         <div className="mt-3 flex items-center justify-between">
-          <span className="font-extrabold text-primary-500">
-            {formatRupiah(product.price)}
-          </span>
+          <div className="flex flex-col">
+            {hasDiscount && (
+              <span className="text-[10px] text-content-placeholder line-through font-medium">
+                {formatRupiah(product.price)}
+              </span>
+            )}
+            <span className="font-extrabold text-primary-500 leading-none">
+              {formatRupiah(finalPrice)}
+            </span>
+          </div>
           {product.daily_stock !== null && (
             <span className="text-[10px] text-content-placeholder">
               Stok: {product.daily_stock}

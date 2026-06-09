@@ -13,6 +13,7 @@ interface ProductDetailModalProps {
     image_url: string | null;
     is_available: boolean;
     daily_stock: number | null;
+    discount_percentage?: number | null;
   };
   avgRating: number;
   ratingCount: number;
@@ -26,6 +27,11 @@ export default function ProductDetailModal({
   onClose,
 }: ProductDetailModalProps) {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+  const hasDiscount = !!product.discount_percentage && product.discount_percentage > 0;
+  const finalPrice = hasDiscount
+    ? product.price - (product.price * (product.discount_percentage! / 100))
+    : product.price;
 
   return (
     <>
@@ -71,6 +77,13 @@ export default function ProductDetailModal({
                 </span>
               </div>
             )}
+            
+            {/* Discount Badge */}
+            {hasDiscount && (
+              <div className="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-md shadow-md border border-white/20">
+                DISKON {product.discount_percentage}%
+              </div>
+            )}
           </div>
 
           {/* Content */}
@@ -78,9 +91,16 @@ export default function ProductDetailModal({
             {/* Nama & Harga */}
             <div>
               <h2 className="text-xl font-bold text-content-primary">{product.name}</h2>
-              <p className="text-2xl font-extrabold text-primary-500 mt-1">
-                {formatRupiah(product.price)}
-              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-2xl font-extrabold text-primary-500">
+                  {formatRupiah(finalPrice)}
+                </p>
+                {hasDiscount && (
+                  <p className="text-sm font-medium text-content-placeholder line-through">
+                    {formatRupiah(product.price)}
+                  </p>
+                )}
+              </div>
               {product.daily_stock !== null && (
                 <p className="text-xs text-content-placeholder mt-1">Stok tersisa: {product.daily_stock}</p>
               )}

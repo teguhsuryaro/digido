@@ -31,6 +31,7 @@ export default function ProductForm({ umkmId, initialData, onSuccess, onCancel }
       description: '',
       price: 0,
       daily_stock: null,
+      discount_percentage: 0,
       is_available: true,
     },
   });
@@ -194,13 +195,22 @@ export default function ProductForm({ umkmId, initialData, onSuccess, onCancel }
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Input
           label="Harga (Rp)"
           type="number"
           placeholder="0"
           {...register('price', { valueAsNumber: true })}
           error={errors.price?.message as any}
+        />
+        <Input
+          label="Diskon (%)"
+          type="number"
+          placeholder="0"
+          {...register('discount_percentage', { 
+            setValueAs: (v) => (v === "" || v === null || Number.isNaN(Number(v))) ? 0 : parseInt(v, 10)
+          })}
+          error={errors.discount_percentage?.message as any}
         />
         <Input
           label="Stok Harian"
