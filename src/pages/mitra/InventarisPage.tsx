@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, Package } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Plus, Pencil, Trash2, Package, ChevronLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatRupiah } from '@/utils/format';
@@ -14,6 +14,8 @@ import ProductForm from '@/components/mitra/ProductForm';
 
 export default function InventarisPage() {
   const navigate = useNavigate();
+  const locationState = useLocation();
+  const isFromSettings = locationState.pathname.includes('/pengaturan');
   const user = useAuthStore((s) => s.user);
   const [umkm, setUmkm] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
@@ -169,14 +171,22 @@ export default function InventarisPage() {
     <PageTransition>
       <div className="space-y-8 pb-20 md:pb-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-content-primary">Manajemen Inventaris</h1>
-            <p className="text-sm text-content-secondary mt-1">Kelola menu dan stok produk Anda.</p>
+        <div className="flex flex-col gap-4">
+          {isFromSettings && (
+            <button onClick={() => navigate('/mitra/pengaturan')} className="flex items-center gap-2 text-content-secondary hover:text-content-primary font-medium w-fit transition-colors">
+              <ChevronLeft size={20} />
+              Kembali ke Pengaturan
+            </button>
+          )}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-content-primary">Manajemen Inventaris</h1>
+              <p className="text-sm text-content-secondary mt-1">Kelola menu dan stok produk Anda.</p>
+            </div>
+            <Button variant="primary" size="sm" onClick={openAdd} className="flex items-center gap-1.5 shrink-0">
+              <Plus size={14} /> Tambah
+            </Button>
           </div>
-          <Button variant="primary" size="sm" onClick={openAdd} className="flex items-center gap-1.5">
-            <Plus size={14} /> Tambah
-          </Button>
         </div>
 
         {/* Product Grid Layout */}

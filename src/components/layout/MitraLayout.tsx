@@ -7,9 +7,8 @@ import Button from '@/components/ui/Button';
 const sidenavItems = [
   { to: '/mitra', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/mitra/pesanan', icon: ClipboardList, label: 'Pesanan' },
-  { to: '/mitra/inventaris', icon: Package, label: 'Katalog' },
-  { to: '/mitra/pengaturan', icon: Settings, label: 'Pengaturan' },
   { to: '/mitra/chat', icon: MessageCircle, label: 'Live Chat' },
+  { to: '/mitra/pengaturan', icon: Settings, label: 'Pengaturan' },
 ];
 
 export default function MitraLayout() {

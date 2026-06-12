@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from '@/components/ui/Toast';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb, ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/ui/PageTransition';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Skeleton from '@/components/ui/Skeleton';
 import LocationPicker from '@/components/LocationPicker';
-import SettingsTabs from '@/components/mitra/SettingsTabs';
 
 const DAYS = [
   { key: 'monday', label: 'Senin' },
@@ -28,6 +28,7 @@ interface ScheduleItem {
 
 export default function OperasionalPage() {
   const user = useAuthStore((s) => s.user);
+  const navigate = useNavigate();
   const [umkm, setUmkm] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -136,12 +137,16 @@ export default function OperasionalPage() {
     <PageTransition>
       <div className="max-w-4xl mx-auto space-y-8 pb-20 md:pb-8">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-black text-content-primary">Pengaturan Toko</h1>
-          <p className="text-sm text-content-secondary mt-1">Kelola semua pengaturan UMKM Anda di sini.</p>
+        <div className="flex flex-col gap-4">
+          <button onClick={() => navigate('/mitra/pengaturan')} className="flex items-center gap-2 text-content-secondary hover:text-content-primary font-medium w-fit transition-colors">
+            <ChevronLeft size={20} />
+            Kembali ke Pengaturan
+          </button>
+          <div>
+            <h1 className="text-2xl font-black text-content-primary">Operasional Toko</h1>
+            <p className="text-sm text-content-secondary mt-1">Kelola jadwal buka tutup dan lokasi toko Anda.</p>
+          </div>
         </div>
-
-        <SettingsTabs />
 
         {/* Emergency Override */}
         <section className="space-y-4">

@@ -15,15 +15,16 @@ import {
 import PageTransition from '@/components/ui/PageTransition';
 import Card from '@/components/ui/Card';
 import Skeleton from '@/components/ui/Skeleton';
-import SettingsTabs from '@/components/mitra/SettingsTabs';
 import Button from '@/components/ui/Button';
-import { Wallet, Calendar } from 'lucide-react';
+import { Wallet, Calendar, ChevronLeft } from 'lucide-react';
 import WithdrawalModal from '@/components/mitra/WithdrawalModal';
+import { useNavigate } from 'react-router-dom';
 
 type PeriodFilter = 'daily' | 'weekly' | 'monthly' | 'yearly';
 
 export default function FinansialPage() {
   const user = useAuthStore((s) => s.user);
+  const navigate = useNavigate();
   const [umkm, setUmkm] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
@@ -196,12 +197,16 @@ export default function FinansialPage() {
     <PageTransition>
       <div className="space-y-8 pb-20 md:pb-8">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-black text-content-primary">Pengaturan Toko</h1>
-          <p className="text-sm text-content-secondary mt-1">Kelola semua pengaturan UMKM Anda di sini.</p>
+        <div className="flex flex-col gap-4">
+          <button onClick={() => navigate('/mitra/pengaturan')} className="flex items-center gap-2 text-content-secondary hover:text-content-primary font-medium w-fit transition-colors">
+            <ChevronLeft size={20} />
+            Kembali ke Pengaturan
+          </button>
+          <div>
+            <h1 className="text-2xl font-black text-content-primary">Keuangan Toko</h1>
+            <p className="text-sm text-content-secondary mt-1">Kelola pendapatan dan penarikan dana.</p>
+          </div>
         </div>
-
-        <SettingsTabs />
 
         {/* Global Wallet Info Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

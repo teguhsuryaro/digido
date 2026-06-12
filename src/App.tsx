@@ -23,7 +23,7 @@ import {
   CartPage, CheckoutPage, WalletPage,
   OrdersPage, OrderDetailPage, ProfilePage,
   MitraDashboardPage, InventarisPage, OrderManagementPage, DeliverySettingsPage,
-  OperasionalPage, FinansialPage, LiveChatPage, MitraProfilePage,
+  OperasionalPage, FinansialPage, LiveChatPage, MitraProfilePage, MitraSettingsPage,
   SubscriptionPage, UMKMReviewsPage,
   SuperadminDashboard, SuperadminMitraApproval, SuperadminReports,
 } from '@/pages';
@@ -234,11 +234,13 @@ export default function App() {
                 <Route index element={<MitraDashboardPage />} />
                 <Route path="inventaris" element={<InventarisPage />} />
                 <Route path="pesanan" element={<OrderManagementPage />} />
-                <Route path="pengaturan" element={<OperasionalPage />} />
+                <Route path="pengaturan" element={<MitraSettingsPage />} />
+                <Route path="pengaturan/operasional" element={<OperasionalPage />} />
                 <Route path="pengaturan/profil" element={<MitraProfilePage />} />
                 <Route path="pengaturan/paket" element={<SubscriptionPage />} />
                 <Route path="pengaturan/pengiriman" element={<DeliverySettingsPage />} />
                 <Route path="pengaturan/finansial" element={<FinansialPage />} />
+                <Route path="pengaturan/katalog" element={<InventarisPage />} />
                 <Route path="chat" element={<LiveChatPage />} />
               </Route>
             </Route>

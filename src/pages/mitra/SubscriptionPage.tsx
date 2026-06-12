@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Crown, Check, ArrowLeft } from 'lucide-react';
+import { Crown, Check, ArrowLeft, ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from '@/components/ui/Toast';
@@ -9,7 +10,6 @@ import Skeleton from '@/components/ui/Skeleton';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import QRISDisplay from '@/components/QRISDisplay';
-import SettingsTabs from '@/components/mitra/SettingsTabs';
 
 interface Plan {
   id: string;
@@ -27,6 +27,7 @@ interface ActiveSub {
 
 export default function SubscriptionPage() {
   const user = useAuthStore((s) => s.user);
+  const navigate = useNavigate();
 
   const [plans, setPlans] = useState<Plan[]>([]);
   const [activeSub, setActiveSub] = useState<ActiveSub | null>(null);
@@ -209,12 +210,16 @@ export default function SubscriptionPage() {
   return (
     <PageTransition>
       <div className="max-w-3xl mx-auto space-y-8 pb-20 md:pb-8">
-        <header>
-          <h1 className="text-2xl font-black text-content-primary">Pengaturan Toko</h1>
-          <p className="text-sm text-content-secondary mt-1">Kelola semua pengaturan UMKM Anda di sini.</p>
-        </header>
-
-        <SettingsTabs />
+        <div className="flex flex-col gap-4">
+          <button onClick={() => navigate('/mitra/pengaturan')} className="flex items-center gap-2 text-content-secondary hover:text-content-primary font-medium w-fit transition-colors">
+            <ChevronLeft size={20} />
+            Kembali ke Pengaturan
+          </button>
+          <div>
+            <h1 className="text-2xl font-black text-content-primary">Langganan & Paket</h1>
+            <p className="text-sm text-content-secondary mt-1">Pilih paket terbaik untuk mengembangkan bisnis Anda.</p>
+          </div>
+        </div>
 
         {/* Status Paket Aktif */}
         <Card className={`p-4 ${activeSub ? 'border-2 border-yellow-500/30 bg-yellow-500/5' : ''}`}>

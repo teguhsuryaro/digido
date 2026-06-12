@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Save, Crown } from 'lucide-react';
+import { Camera, Save, Crown, ChevronLeft, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { uploadFile } from '@/lib/supabase-helpers';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -10,7 +10,6 @@ import Skeleton from '@/components/ui/Skeleton';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
-import SettingsTabs from '@/components/mitra/SettingsTabs';
 
 interface UMKMData {
   id: string;
@@ -18,6 +17,7 @@ interface UMKMData {
   description: string;
   photo_url: string | null;
   whatsapp_number: string | null;
+  is_verified: boolean;
 }
 
 export default function MitraProfilePage() {
@@ -43,7 +43,7 @@ export default function MitraProfilePage() {
       try {
         const { data, error } = await supabase
           .from('umkm')
-          .select('id, name, description, photo_url, whatsapp_number')
+          .select('id, name, description, photo_url, whatsapp_number, is_verified')
           .eq('owner_id', user.id)
           .eq('is_active', true)
           .single();
@@ -171,12 +171,23 @@ export default function MitraProfilePage() {
   return (
     <PageTransition>
       <div className="max-w-4xl mx-auto space-y-8 pb-20 md:pb-8">
-        <header>
-          <h1 className="text-2xl font-black text-content-primary">Pengaturan Toko</h1>
-          <p className="text-sm text-content-secondary mt-1">Kelola semua pengaturan UMKM Anda di sini.</p>
-        </header>
-
-        <SettingsTabs />
+        <div className="flex flex-col gap-4">
+          <button onClick={() => navigate('/mitra/pengaturan')} className="flex items-center gap-2 text-content-secondary hover:text-content-primary font-medium w-fit transition-colors">
+            <ChevronLeft size={20} />
+            Kembali ke Pengaturan
+          </button>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-2xl font-black text-content-primary">Profil Toko</h1>
+              <p className="text-sm text-content-secondary mt-1">Kelola informasi dasar dan tampilan toko Anda.</p>
+            </div>
+            {umkm.is_verified && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-200">
+                <Check size={14} /> Terverifikasi
+              </div>
+            )}
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Kolom Kiri: Foto Profil & Paket */}

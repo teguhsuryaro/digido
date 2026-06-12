@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ChevronLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from '@/components/ui/Toast';
@@ -9,7 +9,6 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Skeleton from '@/components/ui/Skeleton';
-import SettingsTabs from '@/components/mitra/SettingsTabs';
 
 export default function DeliverySettingsPage() {
   const navigate = useNavigate();
@@ -134,12 +133,16 @@ export default function DeliverySettingsPage() {
     <PageTransition>
       <div className="max-w-2xl mx-auto space-y-8 pb-20 md:pb-8">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-black text-content-primary">Pengaturan Toko</h1>
-          <p className="text-sm text-content-secondary mt-1">Kelola semua pengaturan UMKM Anda di sini.</p>
+        <div className="flex flex-col gap-4">
+          <button onClick={() => navigate('/mitra/pengaturan')} className="flex items-center gap-2 text-content-secondary hover:text-content-primary font-medium w-fit transition-colors">
+            <ChevronLeft size={20} />
+            Kembali ke Pengaturan
+          </button>
+          <div>
+            <h1 className="text-2xl font-black text-content-primary">Pengaturan Pengiriman</h1>
+            <p className="text-sm text-content-secondary mt-1">Atur radius maksimal dan tarif per kilometer.</p>
+          </div>
         </div>
-
-        <SettingsTabs />
 
         {noLocation && (
           <div className="bg-amber-50 border border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/30 p-4 rounded-card flex items-start gap-3">
