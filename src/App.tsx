@@ -2,7 +2,8 @@ import { Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
-import { ToastContainer } from '@/components/ui/Toast';
+import { ToastContainer, toast } from '@/components/ui/Toast';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Guards
 import PrivateRoute from '@/components/guards/PrivateRoute';
@@ -47,23 +48,40 @@ export default function App() {
 
   useEffect(() => {
     // 1. Cek session yang sudah ada
-    const initAuth = async () => {
+    const initAuth = async (retryCount = 0) => {
       try {
-        setLoading(true);
+        if (retryCount === 0) setLoading(true);
         const { data: { session }, error } = await supabase.auth.getSession();
 
-        if (error) throw error;
+        if (error) {
+          // Deteksi network error
+          const isNetworkError = error.message.toLowerCase().includes('fetch') || error.message.toLowerCase().includes('network');
+          if (isNetworkError && retryCount < 3) {
+            console.warn(`Koneksi database gagal. Mencoba ulang... (${retryCount + 1}/3)`);
+            toast.warning(`Koneksi terputus. Mencoba ulang... (${retryCount + 1}/3)`);
+            setTimeout(() => initAuth(retryCount + 1), 2000 * Math.pow(2, retryCount));
+            return; // Tunggu eksekusi berikutnya
+          }
+          throw error;
+        }
 
         if (session?.user) {
           // Ambil profile dari database
-          // Gunakan maybeSingle() agar tidak throw error jika profile belum ada
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .maybeSingle();
 
-          if (profileError) throw profileError;
+          if (profileError) {
+             const isNetworkError = profileError.message.toLowerCase().includes('fetch') || profileError.message.toLowerCase().includes('network');
+             if (isNetworkError && retryCount < 3) {
+               console.warn(`Gagal memuat profil. Mencoba ulang... (${retryCount + 1}/3)`);
+               setTimeout(() => initAuth(retryCount + 1), 2000 * Math.pow(2, retryCount));
+               return;
+             }
+             throw profileError;
+          }
 
           if (profile) {
             setAuth(session.user, session);
@@ -75,15 +93,18 @@ export default function App() {
         } else {
           useAuthStore.getState().logout();
         }
-      } catch (err) {
+      } catch (err: any) {
         // Jika ada error apapun (misal token expired/invalid), bersihkan session
         console.error('Auth initialization error:', err);
+        if (err.message && (err.message.includes('fetch') || err.message.includes('network'))) {
+           toast.error('Gagal terhubung ke database. Periksa koneksi internet Anda.');
+        }
         useAuthStore.getState().logout();
         await supabase.auth.signOut().catch(() => {});
-      } finally {
-        // Pastikan loading SELALU selesai, apapun yang terjadi
-        setInitialized(true);
-      }
+      } 
+      
+      // Dipanggil jika sukses atau gagal sepenuhnya (bukan sedang retry)
+      setInitialized(true);
     };
 
     initAuth();
@@ -147,12 +168,36 @@ export default function App() {
       },
     );
 
-    return () => subscription.unsubscribe();
+    // 3. Heartbeat (keep session alive & validate connection)
+    const heartbeatInterval = setInterval(async () => {
+      if (!useAuthStore.getState().isAuthenticated()) return;
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.warn('Heartbeat session error:', error.message);
+          const isNetworkError = error.message.toLowerCase().includes('fetch') || error.message.toLowerCase().includes('network');
+          if (!isNetworkError) {
+             // Jika bukan error network (misal token expired), sign out
+             useAuthStore.getState().logout();
+          }
+        } else if (!session) {
+          useAuthStore.getState().logout();
+        }
+      } catch (e) {
+        console.error('Heartbeat failed', e);
+      }
+    }, 5 * 60 * 1000); // 5 menit
+
+    return () => {
+      subscription.unsubscribe();
+      clearInterval(heartbeatInterval);
+    };
   }, [setAuth, setProfile, setInitialized, setLoading]);
 
   return (
-    <BrowserRouter>
-      <Suspense fallback={<PageLoader />}>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* ===== AUTH ROUTES (Guest Only) ===== */}
           <Route element={<GuestRoute />}>
@@ -231,6 +276,7 @@ export default function App() {
         </Routes>
       </Suspense>
       <ToastContainer />
-    </BrowserRouter>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
