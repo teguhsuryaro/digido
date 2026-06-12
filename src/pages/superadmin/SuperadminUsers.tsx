@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, Search, Ban, Trash2, CheckCircle, ShieldAlert, X } from 'lucide-react';
+import { Users, Search, Ban, CheckCircle, ShieldAlert, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/ui/Toast';
 import { formatDate } from '@/utils/format';
@@ -52,7 +52,7 @@ export default function SuperadminUsers() {
         .select('target_id');
 
       const reportCounts: Record<string, number> = {};
-      reportsData?.forEach(r => {
+      (reportsData as any[])?.forEach(r => {
         if (r.target_id) {
           reportCounts[r.target_id] = (reportCounts[r.target_id] || 0) + 1;
         }

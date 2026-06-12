@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useMitraChatStore, ChatSession, ChatMessage } from '@/store/useMitraChatStore';
+import { useMitraChatStore } from '@/store/useMitraChatStore';
+import type { ChatSession, ChatMessage } from '@/store/useMitraChatStore';
 import { toast } from '@/components/ui/Toast';
-import { MessageCircle, ArrowLeft, Send, CheckCircle2 } from 'lucide-react';
+import { MessageCircle, ArrowLeft, Send } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import PageTransition from '@/components/ui/PageTransition';
 import Card from '@/components/ui/Card';
@@ -268,7 +269,7 @@ export default function LiveChatPage() {
   );
 }
 
-function isBotSession(session: ChatSession) {
+function isBotSession(_session: ChatSession) {
   // Just a helper if we want to disable input on bot only sessions, but actually mitra can take over anytime
   return false;
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, X, Send, Bot, User, Store, AlertCircle } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, Store, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -26,7 +26,7 @@ export default function ChatWidget({ umkm }: ChatWidgetProps) {
   const [isMitraJoined, setIsMitraJoined] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<any>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Initialize Chatbot greeting
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { Package, ClipboardList, Settings, MessageCircle, ShoppingBag, LogOut, Store, LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, Store, ClipboardList, Settings, LogOut, ShoppingBag, MessageCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useMitraChatStore } from '@/store/useMitraChatStore';
@@ -29,7 +29,7 @@ export default function MitraLayout() {
     if (!profile) return;
     const fetchUmkmId = async () => {
       const { data } = await supabase.from('umkm').select('id').eq('owner_id', profile.id).single();
-      if (data) setUmkmId(data.id);
+      if (data) setUmkmId((data as any).id);
     };
     fetchUmkmId();
   }, [profile]);

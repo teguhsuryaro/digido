@@ -24,3 +24,14 @@ export function formatDate(dateString: string): string {
     minute: '2-digit',
   }).format(new Date(dateString));
 }
+
+/**
+ * Memformat tanggal ke string waktu (jam:menit)
+ * Contoh: 2024-05-12T10:30:00 -> 10:30
+ */
+export function formatTime(dateString: string): string {
+  return new Intl.DateTimeFormat('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(dateString));
+}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, MapPin, MessageCircle, Truck, Gift } from 'lucide-react';
+import { Star, MapPin, Truck, Gift } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { formatRupiah } from '@/utils/format';
 import { toast } from '@/components/ui/Toast';
@@ -13,7 +13,6 @@ import MapView from '@/components/MapView';
 import ChatWidget from '@/components/customer/ChatWidget';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import ReportModal from '@/components/ReportModal';
-import { useAuthStore } from '@/store/useAuthStore';
 import { useLocationStore } from '@/store/useLocationStore';
 import { calculateDistance, formatDistance } from '@/utils/distance';
 
@@ -33,7 +32,7 @@ interface UMKM {
 export default function UMKMDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const user = useAuthStore((s) => s.user);
+  // const user = useAuthStore((s) => s.user);
   const [umkm, setUmkm] = useState<UMKM | null>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -38,7 +38,7 @@ export default function SuperadminDashboard() {
           .select('admin_fee', { count: 'exact' })
           .eq('status', 'completed');
           
-        const totalRevenue = (completedData || []).reduce((sum, order) => {
+        const totalRevenue = ((completedData as any[]) || []).reduce((sum, order) => {
           // Fallback to 0 if admin_fee is null/undefined
           return sum + (order.admin_fee || 0);
         }, 0);
@@ -55,6 +55,8 @@ export default function SuperadminDashboard() {
       } finally {
         setIsLoading(false);
       }
+    };
+    
     fetchStats();
 
     const channel = supabase.channel('superadmin_dashboard')

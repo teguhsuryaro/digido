@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { getStoredTheme, applyTheme, Theme } from '@/utils/theme';
+import { getStoredTheme, applyTheme } from '@/utils/theme';
+import type { Theme } from '@/utils/theme';
 
 interface ThemeState {
   theme: Theme;
