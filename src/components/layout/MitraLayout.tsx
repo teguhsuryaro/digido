@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Package, ClipboardList, Settings, MessageCircle, ShoppingBag, LogOut, Store, LayoutDashboard } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useMitraChatStore } from '@/store/useMitraChatStore';
 import { handleLogout } from '@/utils/logout';
 import Button from '@/components/ui/Button';
 
@@ -14,6 +17,32 @@ const sidenavItems = [
 export default function MitraLayout() {
   const profile = useAuthStore((s) => s.profile);
   const navigate = useNavigate();
+  const [umkmId, setUmkmId] = useState<string | null>(null);
+  const addSession = useMitraChatStore(s => s.addSession);
+  const unreadCount = useMitraChatStore(s => 
+    Object.values(s.sessions).filter(sess => sess.status === 'active' && sess.hasUnread).length
+  );
+
+  useEffect(() => {
+    if (!profile) return;
+    const fetchUmkmId = async () => {
+      const { data } = await supabase.from('umkm').select('id').eq('owner_id', profile.id).single();
+      if (data) setUmkmId(data.id);
+    };
+    fetchUmkmId();
+  }, [profile]);
+
+  useEffect(() => {
+    if (!umkmId) return;
+    const channel = supabase.channel(`chat_inbox:${umkmId}`);
+    channel.on('broadcast', { event: 'new_chat' }, ({ payload }) => {
+      addSession(payload.session);
+    }).subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [umkmId, addSession]);
 
   const onLogout = async () => {
     await handleLogout(navigate);
@@ -54,7 +83,14 @@ export default function MitraLayout() {
               >
                 {({ isActive }) => (
                   <>
-                    <Icon size={18} strokeWidth={isActive ? 2 : 1.5} className="shrink-0" />
+                    <div className="relative">
+                      <Icon size={18} strokeWidth={isActive ? 2 : 1.5} className="shrink-0" />
+                      {item.to === '/mitra/chat' && unreadCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-in zoom-in">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
+                    </div>
                     <span>{item.label}</span>
                   </>
                 )}
@@ -101,7 +137,14 @@ export default function MitraLayout() {
               >
                 {({ isActive }) => (
                   <>
-                    <Icon size={18} strokeWidth={isActive ? 2.5 : 1.5} />
+                    <div className="relative">
+                      <Icon size={18} strokeWidth={isActive ? 2.5 : 1.5} />
+                      {item.to === '/mitra/chat' && unreadCount > 0 && (
+                        <span className="absolute -top-1.5 -right-2 w-3.5 h-3.5 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center animate-in zoom-in border-2 border-surface-card">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[8px] font-bold">{item.label}</span>
                   </>
                 )}

@@ -10,7 +10,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import ProductCard from '@/components/ProductCard';
 import MapView from '@/components/MapView';
-import ChatbotWidget from '@/components/chatbot/ChatbotWidget';
+import ChatWidget from '@/components/customer/ChatWidget';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import ReportModal from '@/components/ReportModal';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -179,31 +179,6 @@ export default function UMKMDetailPage() {
                 </span>
               </>
             )}
-            
-            <div className="w-1 h-1 bg-border rounded-full" />
-            {umkm.whatsapp_number ? (
-              <a
-                href={(() => {
-                  let cleaned = umkm.whatsapp_number!.replace(/\D/g, '');
-                  if (cleaned.startsWith('0')) {
-                    cleaned = '62' + cleaned.substring(1);
-                  } else if (!cleaned.startsWith('62')) {
-                    cleaned = '62' + cleaned;
-                  }
-                  const message = `Halo, saya tertarik dengan produk di toko ${umkm.name}`;
-                  return `https://wa.me/${cleaned}?text=${encodeURIComponent(message)}`;
-                })()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-green-600 dark:text-green-400 font-bold hover:underline flex items-center gap-1.5"
-              >
-                <MessageCircle size={14} /> Chat Penjual (WhatsApp)
-              </a>
-            ) : (
-              <span className="text-content-placeholder flex items-center gap-1.5 cursor-not-allowed opacity-50">
-                <MessageCircle size={14} /> Chat Penjual (WhatsApp)
-              </span>
-            )}
           </div>
 
           <p className="mt-4 text-content-secondary leading-relaxed text-sm sm:text-base">
@@ -313,7 +288,7 @@ export default function UMKMDetailPage() {
         </div>
 
         {/* Chatbot overlay remains at the very bottom */}
-        {user && umkm && <ChatbotWidget umkmId={umkm.id} umkmName={umkm.name} />}
+        {umkm && <ChatWidget umkm={umkm} />}
       </div>
 
       {/* Modal Detail Produk */}
