@@ -34,3 +34,4 @@ export const MitraSettingsPage = lazy(() => import('@/pages/mitra/MitraSettingsP
 export const SuperadminDashboard = lazy(() => import('@/pages/superadmin/SuperadminDashboard'));
 export const SuperadminMitraApproval = lazy(() => import('@/pages/superadmin/SuperadminMitraApproval'));
 export const SuperadminReports = lazy(() => import('@/pages/superadmin/SuperadminReports'));
+export const SuperadminUsers = lazy(() => import('@/pages/superadmin/SuperadminUsers'));

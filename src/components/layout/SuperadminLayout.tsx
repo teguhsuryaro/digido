@@ -8,6 +8,7 @@ import { useState } from 'react';
 
 const sidenavItems = [
   { to: '/superadmin', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/superadmin/pengguna', icon: Users, label: 'Pengguna' },
   { to: '/superadmin/mitra', icon: Users, label: 'Validasi Mitra' },
   { to: '/superadmin/laporan', icon: AlertTriangle, label: 'Laporan Masuk' },
 ];

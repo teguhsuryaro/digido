@@ -10,6 +10,8 @@ interface Profile {
   phone: string | null;
   avatar_url: string | null;
   role: UserRole;
+  ban_status: 'active' | 'banned_pelanggan' | 'banned_mitra' | 'banned_permanent';
+  ban_reason: string | null;
 }
 
 interface AuthState {
