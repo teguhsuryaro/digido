@@ -29,6 +29,14 @@ npm-debug.log*
 bug-fixes/
 bug-fixes-2/
 skenario-data-seeding/
+
+# Ignore all .md except README and production planning docs
 *.md
 !README.md
-production/
+!production/revisi-01/**/*.md
+!production/revisi-02/**/*.md
+
+# Ignore production root but whitelist revisi folders
+production/*
+!production/revisi-01/
+!production/revisi-02/
