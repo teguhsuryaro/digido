@@ -33,8 +33,6 @@ export default function SuperadminUsers() {
   const [banType, setBanType] = useState<'banned_pelanggan' | 'banned_mitra' | 'banned_permanent' | 'active'>('active');
   const [banReason, setBanReason] = useState('');
   
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isActionLoading, setIsActionLoading] = useState(false);
 
   const fetchUsers = async () => {
@@ -108,30 +106,6 @@ export default function SuperadminUsers() {
     } catch (err) {
       console.error('Error updating ban status:', err);
       toast.error('Gagal mengubah status akun.');
-    } finally {
-      setIsActionLoading(false);
-    }
-  };
-
-  const handleDeleteUser = async () => {
-    if (!selectedUser) return;
-    setIsActionLoading(true);
-
-    try {
-      // In this system, we use an RPC 'delete_user_data' to hard delete the user
-      // If RPC doesn't exist yet, this will fail gracefully.
-      const { error } = await supabase.rpc('delete_user_data', { user_id_param: selectedUser.id });
-
-      if (error) throw error;
-
-      toast.success(`Akun ${selectedUser.full_name} berhasil dihapus permanen.`);
-      setIsDeleteModalOpen(false);
-      setSelectedUser(null);
-      setDeleteConfirmText('');
-      fetchUsers();
-    } catch (err) {
-      console.error('Error deleting user:', err);
-      toast.error('Gagal menghapus akun. Pastikan fungsi SQL delete_user_data sudah terpasang.');
     } finally {
       setIsActionLoading(false);
     }
@@ -267,7 +241,7 @@ export default function SuperadminUsers() {
       </Card>
 
       {/* User Detail Modal */}
-      {selectedUser && !isBanModalOpen && !isDeleteModalOpen && (
+      {selectedUser && !isBanModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <Card className="w-full max-w-lg overflow-hidden animate-in zoom-in-95">
             <div className="p-4 border-b border-border flex justify-between items-center bg-surface-secondary/50">
@@ -343,17 +317,6 @@ export default function SuperadminUsers() {
                     <CheckCircle size={16} className="mr-2" /> Pulihkan Akun (Unban)
                   </Button>
                 )}
-
-                <div className="border-t border-border pt-3 mt-4">
-                  <Button 
-                    variant="ghost" 
-                    fullWidth 
-                    className="text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
-                    onClick={() => setIsDeleteModalOpen(true)}
-                  >
-                    <Trash2 size={16} className="mr-2" /> Hapus Akun Permanen
-                  </Button>
-                </div>
               </div>
             </div>
           </Card>
@@ -395,56 +358,6 @@ export default function SuperadminUsers() {
                   className="bg-orange-500 hover:bg-orange-600 border-none text-white"
                 >
                   Konfirmasi
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
-
-      {/* Delete User Dialog */}
-      {isDeleteModalOpen && selectedUser && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <Card className="w-full max-w-md overflow-hidden animate-in zoom-in-95 border-red-500">
-            <div className="bg-red-500 p-6 text-center relative">
-              <Trash2 size={40} className="mx-auto text-white mb-2" />
-              <h3 className="text-xl font-bold text-white">Hapus Akun Permanen!</h3>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border border-red-100 dark:border-red-900/30">
-                <p className="text-sm text-red-700 dark:text-red-400 leading-relaxed font-medium">
-                  Perhatian! Menghapus akun ini akan ikut menghapus:
-                </p>
-                <ul className="list-disc list-inside text-xs text-red-600 dark:text-red-300 mt-2 space-y-1">
-                  <li>Data Profil</li>
-                  <li>Data UMKM & Produk (Jika Mitra)</li>
-                  <li>Riwayat Pesanan</li>
-                  <li>Ulasan & Laporan</li>
-                </ul>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-content-secondary">
-                  Ketik <strong className="text-content-primary select-none">{selectedUser.full_name}</strong> untuk konfirmasi.
-                </p>
-                <Input 
-                  placeholder="Ketik nama pengguna..."
-                  value={deleteConfirmText}
-                  onChange={(e) => setDeleteConfirmText(e.target.value)}
-                  className="font-bold text-red-500"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-2">
-                <Button variant="secondary" fullWidth onClick={() => setIsDeleteModalOpen(false)}>Batal</Button>
-                <Button 
-                  variant="danger" 
-                  fullWidth 
-                  onClick={handleDeleteUser}
-                  isLoading={isActionLoading}
-                  disabled={deleteConfirmText !== selectedUser.full_name}
-                >
-                  Ya, Hapus Permanen
                 </Button>
               </div>
             </div>
