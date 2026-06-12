@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useMitraChatStore } from '@/store/useMitraChatStore';
 import { handleLogout } from '@/utils/logout';
 import Button from '@/components/ui/Button';
+import ConfirmLogoutModal from '@/components/ui/ConfirmLogoutModal';
 
 const sidenavItems = [
   { to: '/mitra', icon: LayoutDashboard, label: 'Dashboard' },
@@ -18,6 +19,7 @@ export default function MitraLayout() {
   const profile = useAuthStore((s) => s.profile);
   const navigate = useNavigate();
   const [umkmId, setUmkmId] = useState<string | null>(null);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const addSession = useMitraChatStore(s => s.addSession);
   const unreadCount = useMitraChatStore(s => 
     Object.values(s.sessions).filter(sess => sess.status === 'active' && sess.hasUnread).length
@@ -108,7 +110,7 @@ export default function MitraLayout() {
             <ShoppingBag size={18} className="shrink-0" />
             <span>Belanja</span>
           </NavLink>
-          <Button variant="ghost" size="sm" onClick={onLogout} className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20">
+          <Button variant="ghost" size="sm" onClick={() => setIsLogoutModalOpen(true)} className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20">
             <LogOut size={16} className="mr-2" /> Keluar
           </Button>
         </div>
@@ -168,6 +170,12 @@ export default function MitraLayout() {
           </NavLink>
         </div>
       </nav>
+
+      <ConfirmLogoutModal 
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={onLogout}
+      />
     </div>
   );
 }

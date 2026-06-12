@@ -3,6 +3,8 @@ import { LayoutDashboard, Users, AlertTriangle, LogOut, ShieldAlert } from 'luci
 import { useAuthStore } from '@/store/useAuthStore';
 import { handleLogout } from '@/utils/logout';
 import Button from '@/components/ui/Button';
+import ConfirmLogoutModal from '@/components/ui/ConfirmLogoutModal';
+import { useState } from 'react';
 
 const sidenavItems = [
   { to: '/superadmin', icon: LayoutDashboard, label: 'Dashboard' },
@@ -13,6 +15,7 @@ const sidenavItems = [
 export default function SuperadminLayout() {
   const profile = useAuthStore((s) => s.profile);
   const navigate = useNavigate();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const onLogout = async () => {
     await handleLogout(navigate);
@@ -64,7 +67,7 @@ export default function SuperadminLayout() {
 
         {/* Sidebar Footer Extra Links */}
         <div className="border-t border-border pt-2 mt-auto">
-          <Button variant="ghost" size="sm" onClick={onLogout} className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20">
+          <Button variant="ghost" size="sm" onClick={() => setIsLogoutModalOpen(true)} className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20">
             <LogOut size={16} className="mr-2" /> Keluar
           </Button>
         </div>
@@ -101,7 +104,7 @@ export default function SuperadminLayout() {
             );
           })}
           <button
-            onClick={onLogout}
+            onClick={() => setIsLogoutModalOpen(true)}
             className="flex flex-col items-center justify-center gap-1 w-16 shrink-0 transition-colors text-content-secondary hover:text-red-500"
           >
             <LogOut size={20} strokeWidth={1.5} />
@@ -109,6 +112,12 @@ export default function SuperadminLayout() {
           </button>
         </div>
       </nav>
+
+      <ConfirmLogoutModal 
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={onLogout}
+      />
     </div>
   );
 }

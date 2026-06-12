@@ -11,6 +11,7 @@ import PageTransition from '@/components/ui/PageTransition';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
+import ConfirmLogoutModal from '@/components/ui/ConfirmLogoutModal';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ export default function ProfilePage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoadingWallet, setIsLoadingWallet] = useState(true);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -331,7 +333,7 @@ export default function ProfilePage() {
 
               {/* Logout */}
               <button 
-                onClick={onLogout}
+                onClick={() => setIsLogoutModalOpen(true)}
                 className="w-full p-4 flex items-center justify-between hover:bg-red-50 dark:hover:bg-red-950/20 text-red-500 transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -357,6 +359,12 @@ export default function ProfilePage() {
           <p className="text-[10px] text-content-placeholder mt-1">Made with ❤️ for UMKM Indonesia</p>
         </div>
       </div>
+      
+      <ConfirmLogoutModal 
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={onLogout}
+      />
     </PageTransition>
   );
 }
