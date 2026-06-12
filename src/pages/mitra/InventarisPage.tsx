@@ -183,65 +183,83 @@ export default function InventarisPage() {
         {products.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {products.map((product) => (
-              <Card key={product.id} className="p-3 border-border hover:border-primary-500/50 transition-colors flex items-center gap-4">
-                {/* Thumbnail */}
-                <div className="w-16 h-16 rounded-lg bg-surface-secondary overflow-hidden flex-shrink-0 flex items-center justify-center">
-                  {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <Package size={24} className="text-content-placeholder" />
-                  )}
+              <Card key={product.id} className="p-3 border-border hover:border-primary-500/50 transition-colors flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                {/* Thumbnail & Title (Mobile) */}
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="w-16 h-16 rounded-lg bg-surface-secondary overflow-hidden shrink-0 flex items-center justify-center">
+                    {product.image_url ? (
+                      <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Package size={24} className="text-content-placeholder" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0 sm:hidden">
+                    <h3 className="font-bold text-content-primary text-sm truncate">{product.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm font-bold text-primary-500">{formatRupiah(product.price)}</span>
+                      <div className="w-1 h-1 bg-border rounded-full shrink-0" />
+                      <span className="text-[10px] text-content-placeholder uppercase font-bold shrink-0 truncate">
+                        Stok: {product.daily_stock ?? '∞'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
+                {/* Info (Desktop) */}
+                <div className="hidden sm:block flex-1 min-w-0">
                   <h3 className="font-bold text-content-primary text-sm truncate">{product.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-sm font-bold text-primary-500">{formatRupiah(product.price)}</span>
-                    <div className="w-1 h-1 bg-border rounded-full" />
-                    <span className="text-[10px] text-content-placeholder uppercase font-bold">
+                    <span className="text-sm font-bold text-primary-500 shrink-0">{formatRupiah(product.price)}</span>
+                    <div className="w-1 h-1 bg-border rounded-full shrink-0" />
+                    <span className="text-[10px] text-content-placeholder uppercase font-bold shrink-0">
                       Stok: {product.daily_stock ?? '∞'}
                     </span>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-1.5">
-                  {/* Toggle Stock */}
-                  <button 
-                    onClick={() => handleToggleStock(product)}
-                    className={`
-                      w-10 h-6 rounded-full p-1 transition-colors relative shrink-0
-                      ${product.is_available ? 'bg-green-500' : 'bg-content-placeholder'}
-                    `}
-                    aria-label="Toggles stock availability"
-                  >
-                    <div className={`
-                      w-4 h-4 bg-white rounded-full shadow-sm transition-transform
-                      ${product.is_available ? 'translate-x-4' : ''}
-                    `} />
-                  </button>
+                <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/30">
+                  <span className="text-[10px] font-bold text-content-secondary uppercase sm:hidden">
+                    {product.is_available ? 'Tersedia' : 'Habis'}
+                  </span>
+                  
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {/* Toggle Stock */}
+                    <button 
+                      onClick={() => handleToggleStock(product)}
+                      className={`
+                        w-10 h-6 rounded-full p-1 transition-colors relative shrink-0
+                        ${product.is_available ? 'bg-green-500' : 'bg-content-placeholder'}
+                      `}
+                      aria-label="Toggles stock availability"
+                    >
+                      <div className={`
+                        w-4 h-4 bg-white rounded-full shadow-sm transition-transform
+                        ${product.is_available ? 'translate-x-4' : ''}
+                      `} />
+                    </button>
 
-                  {/* Edit */}
-                  <button 
-                    onClick={() => openEdit(product)}
-                    className="p-1.5 text-content-placeholder hover:text-primary-500 transition-colors shrink-0"
-                    aria-label="Edit product"
-                  >
-                    <Pencil size={16} />
-                  </button>
+                    {/* Edit */}
+                    <button 
+                      onClick={() => openEdit(product)}
+                      className="p-1.5 text-content-placeholder hover:text-primary-500 transition-colors shrink-0"
+                      aria-label="Edit product"
+                    >
+                      <Pencil size={16} />
+                    </button>
 
-                  {/* Delete */}
-                  <button 
-                    onClick={() => {
-                      setDeletingProduct(product);
-                      setIsDeleteOpen(true);
-                    }}
-                    className="p-1.5 text-content-placeholder hover:text-red-500 transition-colors shrink-0"
-                    aria-label="Delete product"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                    {/* Delete */}
+                    <button 
+                      onClick={() => {
+                        setDeletingProduct(product);
+                        setIsDeleteOpen(true);
+                      }}
+                      className="p-1.5 text-content-placeholder hover:text-red-500 transition-colors shrink-0"
+                      aria-label="Delete product"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               </Card>
             ))}
@@ -261,7 +279,7 @@ export default function InventarisPage() {
           onClose={() => setIsFormOpen(false)}
           title={editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}
         >
-          <div className="p-4">
+          <div className="p-0">
             <ProductForm 
               umkmId={umkm?.id} 
               initialData={editingProduct}

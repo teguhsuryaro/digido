@@ -149,12 +149,13 @@ export default function ProductForm({ umkmId, initialData, onSuccess, onCancel }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col max-h-[85vh]">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
       {/* Image Upload */}
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-3">
         <div 
           onClick={() => fileInputRef.current?.click()}
-          className="w-full h-48 rounded-card border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary-500 transition-colors bg-surface-secondary overflow-hidden relative group"
+          className="w-full h-32 md:h-40 rounded-card border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary-500 transition-colors bg-surface-secondary overflow-hidden relative group"
         >
           {previewUrl ? (
             <>
@@ -191,7 +192,7 @@ export default function ProductForm({ umkmId, initialData, onSuccess, onCancel }
         <textarea
           {...register('description')}
           placeholder="Jelaskan isi atau keunggulan produk..."
-          className="w-full p-4 rounded-card bg-surface-secondary border border-border text-sm outline-none focus:ring-2 focus:ring-primary-500/20 min-h-[100px]"
+          className="w-full p-3 rounded-card bg-surface-secondary border border-border text-sm outline-none focus:ring-2 focus:ring-primary-500/20 min-h-[80px]"
         />
       </div>
 
@@ -231,8 +232,10 @@ export default function ProductForm({ umkmId, initialData, onSuccess, onCancel }
           <p className="text-[10px] text-content-placeholder mt-1 px-1">Kosongkan jika stok tidak terbatas.</p>
         </div>
       </div>
+      </div>
 
-      <div className="flex flex-col gap-3 pt-4">
+      {/* Sticky Buttons */}
+      <div className="p-4 border-t border-border bg-surface-primary sticky bottom-0 z-10 shrink-0">
         <div className="flex gap-3">
           <Button 
             variant="secondary" 
