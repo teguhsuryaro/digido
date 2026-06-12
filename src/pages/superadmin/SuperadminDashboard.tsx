@@ -55,9 +55,18 @@ export default function SuperadminDashboard() {
       } finally {
         setIsLoading(false);
       }
-    };
-
     fetchStats();
+
+    const channel = supabase.channel('superadmin_dashboard')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => fetchStats())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, () => fetchStats())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'umkm' }, () => fetchStats())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchStats())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (

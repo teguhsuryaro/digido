@@ -74,7 +74,7 @@ export default function SuperadminLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 w-full max-w-6xl mx-auto px-4 py-6 md:px-8">
+      <main className="flex-1 min-w-0 w-full max-w-5xl mx-auto px-4 py-6 md:px-8">
         <Outlet />
       </main>
 
