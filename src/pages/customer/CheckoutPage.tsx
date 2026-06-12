@@ -26,6 +26,7 @@ export default function CheckoutPage() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const subtotal = getSubtotal();
+  const ADMIN_FEE = 500;
 
   useEffect(() => {
     if (!user || !umkmId) return;
@@ -70,7 +71,7 @@ export default function CheckoutPage() {
 
   // Hitung Potongan Dompet
   const walletBalance = (wallet as any)?.balance || 0;
-  const totalBeforeWallet = subtotal + deliveryFee;
+  const totalBeforeWallet = subtotal + deliveryFee + ADMIN_FEE;
   const walletDeduction = useWallet ? Math.min(walletBalance, totalBeforeWallet) : 0;
   const finalTotal = totalBeforeWallet - walletDeduction;
 
@@ -113,6 +114,7 @@ export default function CheckoutPage() {
           umkm_id: umkmId,
           subtotal,
           delivery_fee: deliveryFee,
+          admin_fee: ADMIN_FEE,
           wallet_deduction: walletDeduction,
           total: finalTotal,
           status: 'pending',
@@ -276,6 +278,10 @@ export default function CheckoutPage() {
             <div className="flex justify-between">
               <span className="text-content-secondary">Ongkos Kirim</span>
               <span className="font-medium text-content-primary">{deliveryFee === 0 ? 'Gratis' : formatRupiah(deliveryFee)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-content-secondary">Biaya Admin DigiDO</span>
+              <span className="font-medium text-content-primary">{formatRupiah(ADMIN_FEE)}</span>
             </div>
             {walletDeduction > 0 && (
               <div className="flex justify-between text-green-600 font-bold dark:text-green-400">

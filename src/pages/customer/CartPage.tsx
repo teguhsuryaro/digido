@@ -46,6 +46,7 @@ export default function CartPage() {
 
   const subtotal = getSubtotal();
   const itemCount = getItemCount();
+  const ADMIN_FEE = 500;
 
   // Estimasi ongkir (hanya jika flat atau free promo terpenuhi)
   let estimatedOngkir = 0;
@@ -136,12 +137,16 @@ export default function CartPage() {
                       )}
                     </span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-content-secondary">Biaya Admin DigiDO</span>
+                    <span className="font-medium text-content-primary">{formatRupiah(ADMIN_FEE)}</span>
+                  </div>
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-border flex justify-between items-center">
                   <span className="font-bold text-content-primary text-base">Total Estimasi</span>
                   <span className="font-extrabold text-primary-500 text-xl">
-                    {formatRupiah(subtotal + estimatedOngkir)}
+                    {formatRupiah(subtotal + estimatedOngkir + ADMIN_FEE)}
                   </span>
                 </div>
 

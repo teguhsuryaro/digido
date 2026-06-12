@@ -59,7 +59,8 @@ export default function FinansialPage() {
 
   // Statistics Calculation
   const stats = useMemo(() => {
-    const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
+    // Mitra receives total order amount MINUS the admin fee (default to 500 if older orders don't have it set)
+    const totalRevenue = orders.reduce((sum, o) => sum + (o.total - (o.admin_fee || 500)), 0);
     const orderCount = orders.length;
     const avgValue = orderCount > 0 ? totalRevenue / orderCount : 0;
     
@@ -81,7 +82,7 @@ export default function FinansialPage() {
     return last7Days.map(date => {
       const dayTotal = orders
         .filter(o => o.created_at.split('T')[0] === date)
-        .reduce((sum, o) => sum + o.total, 0);
+        .reduce((sum, o) => sum + (o.total - (o.admin_fee || 500)), 0);
       
       return {
         date: formatDate(date).split(',')[0], // "13 Mei"

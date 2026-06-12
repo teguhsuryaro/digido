@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { LayoutDashboard, Users, Store, AlertTriangle, CheckCircle } from 'lucide-react';
+import { LayoutDashboard, Users, Store, AlertTriangle, CheckCircle, Banknote } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { formatRupiah } from '@/utils/format';
 import Skeleton from '@/components/ui/Skeleton';
 import Card from '@/components/ui/Card';
 
@@ -10,6 +11,7 @@ export default function SuperadminDashboard() {
     totalMitra: 0,
     openReports: 0,
     completedOrders: 0,
+    totalRevenue: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,16 +33,22 @@ export default function SuperadminDashboard() {
           .select('*', { count: 'exact', head: true })
           .in('status', ['open', 'reviewed']);
 
-        const { count: completedOrders } = await supabase
+        const { data: completedData, count: completedOrders } = await supabase
           .from('orders')
-          .select('*', { count: 'exact', head: true })
+          .select('admin_fee', { count: 'exact' })
           .eq('status', 'completed');
+          
+        const totalRevenue = (completedData || []).reduce((sum, order) => {
+          // Fallback to 0 if admin_fee is null/undefined
+          return sum + (order.admin_fee || 0);
+        }, 0);
 
         setStats({
           totalUsers: totalUsers || 0,
           totalMitra: totalMitra || 0,
           openReports: openReports || 0,
           completedOrders: completedOrders || 0,
+          totalRevenue: totalRevenue,
         });
       } catch (err) {
         console.error('Error fetching superadmin stats:', err);
@@ -92,6 +100,13 @@ export default function SuperadminDashboard() {
               <CheckCircle size={20} className="text-purple-500" />
             </div>
             <p className="text-3xl font-extrabold text-content-primary">{stats.completedOrders}</p>
+          </Card>
+          <Card className="p-6 flex flex-col gap-2 border-l-4 border-l-yellow-500">
+            <div className="flex justify-between items-start">
+              <p className="text-sm font-medium text-content-secondary">Pendapatan Platform</p>
+              <Banknote size={20} className="text-yellow-500" />
+            </div>
+            <p className="text-2xl font-extrabold text-yellow-500">{formatRupiah(stats.totalRevenue)}</p>
           </Card>
         </div>
       )}
