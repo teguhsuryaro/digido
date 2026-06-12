@@ -1,12 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import { User, Settings, Truck, CreditCard, Shield, Package, ShoppingBag, Moon, Sun } from 'lucide-react';
-import { useThemeStore } from '@/store/useThemeStore';
+import { User, Settings, Truck, CreditCard, Shield, Package, ShoppingBag } from 'lucide-react';
 import PageTransition from '@/components/ui/PageTransition';
 import Card from '@/components/ui/Card';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function MitraSettingsPage() {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useThemeStore();
 
   const settingsItems = [
     { to: '/mitra/pengaturan/profil', label: 'Profil Toko', desc: 'Edit nama, deskripsi, foto', icon: User },
@@ -50,16 +49,18 @@ export default function MitraSettingsPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Theme Toggle */}
-          <Card 
-            className="p-4 border-border hover:border-primary-500/50 cursor-pointer transition-colors group flex items-start gap-4"
-            onClick={toggleTheme}
-          >
-            <div className="w-10 h-10 rounded-full bg-surface-secondary text-content-secondary group-hover:bg-primary-50 group-hover:text-primary-500 flex items-center justify-center shrink-0 transition-colors">
-              {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-content-primary group-hover:text-primary-500 transition-colors text-sm">Tema Tampilan</h3>
-              <p className="text-xs text-content-secondary mt-0.5">Ubah mode terang / gelap</p>
+          <Card className="p-0 overflow-hidden border-border">
+            <div className="p-4 flex items-center justify-between border-b border-border hover:bg-surface-secondary/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-600 shrink-0">
+                  <Shield size={20} />
+                </div>
+                <div>
+                  <p className="font-bold text-content-primary text-sm">Tema Aplikasi</p>
+                  <p className="text-[10px] text-content-secondary">Pilih tema terang atau gelap</p>
+                </div>
+              </div>
+              <ThemeToggle />
             </div>
           </Card>
 

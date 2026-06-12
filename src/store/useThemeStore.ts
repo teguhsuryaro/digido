@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getStoredTheme, applyTheme, type Theme } from '@/utils/theme';
+import { getStoredTheme, applyTheme, Theme } from '@/utils/theme';
 
 interface ThemeState {
   theme: Theme;
@@ -7,18 +7,15 @@ interface ThemeState {
   setTheme: (theme: Theme) => void;
 }
 
-export const useThemeStore = create<ThemeState>((set) => ({
+export const useThemeStore = create<ThemeState>()((set) => ({
   theme: getStoredTheme(),
-
-  toggleTheme: () =>
-    set((state) => {
-      const next: Theme = state.theme === 'dark' ? 'light' : 'dark';
-      applyTheme(next);
-      return { theme: next };
-    }),
-
-  setTheme: (theme: Theme) => {
+  toggleTheme: () => set((state) => {
+    const next = state.theme === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    return { theme: next };
+  }),
+  setTheme: (theme) => set(() => {
     applyTheme(theme);
-    set({ theme });
-  },
+    return { theme };
+  }),
 }));

@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { handleLogout } from '@/utils/logout';
 import Button from '@/components/ui/Button';
 import ConfirmLogoutModal from '@/components/ui/ConfirmLogoutModal';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 import { useState } from 'react';
 
 const sidenavItems = [
@@ -33,9 +34,12 @@ export default function SuperadminLayout() {
             <ShieldAlert size={20} className="text-red-500" />
             <h2 className="text-lg font-bold text-red-500">Superadmin</h2>
           </div>
-          <p className="text-xs text-content-secondary mt-1 pl-7">
-            {profile?.full_name || 'Admin'}
-          </p>
+          <div className="flex items-center justify-between mt-1">
+            <p className="text-xs text-content-secondary pl-7">
+              {profile?.full_name || 'Admin'}
+            </p>
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Sidebar Navigation */}
@@ -76,6 +80,9 @@ export default function SuperadminLayout() {
 
       {/* Main Content Area */}
       <main className="flex-1 min-w-0 w-full max-w-5xl mx-auto px-4 py-6 md:px-8">
+        <div className="md:hidden flex justify-end mb-4">
+          <ThemeToggle />
+        </div>
         <Outlet />
       </main>
 

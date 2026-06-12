@@ -1,9 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Store, BarChart3, ShoppingBag, Moon, Sun, LogOut, ChevronRight } from 'lucide-react';
+import { Camera, Store, BarChart3, ShoppingBag, LogOut, ChevronRight, Settings } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useThemeStore } from '@/store/useThemeStore';
 import { handleLogout } from '@/utils/logout';
 import { formatRupiah } from '@/utils/format';
 import { toast } from '@/components/ui/Toast';
@@ -12,11 +11,11 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import ConfirmLogoutModal from '@/components/ui/ConfirmLogoutModal';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   const { user, profile, setProfile } = useAuthStore();
-  const { theme, toggleTheme } = useThemeStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState(profile?.full_name || '');
@@ -313,23 +312,18 @@ export default function ProfilePage() {
               )}
 
               {/* Theme Toggle */}
-              <button 
-                onClick={toggleTheme}
-                className="w-full p-4 flex items-center justify-between hover:bg-surface-secondary transition-colors"
-              >
+              <div className="w-full p-4 flex items-center justify-between border-b border-border hover:bg-surface-secondary/50 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-surface-secondary dark:bg-surface-tertiary flex items-center justify-center text-content-primary shrink-0">
-                    {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
+                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-950/30 flex items-center justify-center text-blue-600 shrink-0">
+                    <Settings size={20} />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold text-content-primary">Mode {theme === 'dark' ? 'Gelap' : 'Terang'}</p>
-                    <p className="text-[10px] text-content-secondary">Klik untuk ubah tema</p>
+                    <p className="text-sm font-bold">Tema Aplikasi</p>
+                    <p className="text-[10px] text-content-secondary">Ubah tampilan aplikasi</p>
                   </div>
                 </div>
-                <div className={`w-10 h-6 rounded-full p-1 transition-colors shrink-0 ${theme === 'dark' ? 'bg-primary-500' : 'bg-border'}`}>
-                  <div className={`w-4 h-4 bg-white rounded-full transition-transform ${theme === 'dark' ? 'translate-x-4' : ''}`} />
-                </div>
-              </button>
+                <ThemeToggle />
+              </div>
 
               {/* Logout */}
               <button 
