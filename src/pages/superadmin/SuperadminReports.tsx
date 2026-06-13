@@ -12,6 +12,7 @@ interface Report {
   reason: string;
   status: string;
   created_at: string;
+  target_name?: string;
   profiles: {
     full_name: string;
     email: string;
@@ -21,6 +22,7 @@ interface Report {
 export default function SuperadminReports() {
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [filterType, setFilterType] = useState<'all' | 'toko' | 'website'>('all');
 
   useEffect(() => {
     fetchReports();
@@ -38,7 +40,36 @@ export default function SuperadminReports() {
         .order('created_at', { ascending: false })) as any;
 
       if (error) throw error;
-      setReports(data || []);
+      
+      const reportsData = data || [];
+      
+      // Ambil nama target untuk UMKM dan Produk
+      const umkmIds = reportsData.filter((r: any) => r.target_type === 'umkm').map((r: any) => r.target_id);
+      const productIds = reportsData.filter((r: any) => r.target_type === 'product').map((r: any) => r.target_id);
+      
+      const umkmMap = new Map();
+      const productMap = new Map();
+      
+      if (umkmIds.length > 0) {
+        const { data: umkmData } = await supabase.from('umkm').select('id, store_name').in('id', umkmIds);
+        (umkmData as any[])?.forEach(u => umkmMap.set(u.id, u.store_name));
+      }
+      
+      if (productIds.length > 0) {
+        const { data: prodData } = await supabase.from('products').select('id, name').in('id', productIds);
+        (prodData as any[])?.forEach(p => productMap.set(p.id, p.name));
+      }
+      
+      const finalReports = reportsData.map((r: any) => {
+        let targetName = '-';
+        if (r.target_type === 'umkm') targetName = umkmMap.get(r.target_id) || 'Toko Tidak Ditemukan';
+        if (r.target_type === 'product') targetName = productMap.get(r.target_id) || 'Produk Tidak Ditemukan';
+        if (r.target_type === 'website') targetName = 'Website Digido';
+        
+        return { ...r, target_name: targetName };
+      });
+
+      setReports(finalReports);
     } catch (err) {
       console.error('Error fetching reports:', err);
       toast.error('Gagal mengambil data laporan.');
@@ -63,6 +94,12 @@ export default function SuperadminReports() {
     }
   };
 
+  const filteredReports = reports.filter(r => {
+    if (filterType === 'all') return true;
+    if (filterType === 'website') return r.target_type === 'website';
+    return r.target_type === 'umkm' || r.target_type === 'product';
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
@@ -71,8 +108,33 @@ export default function SuperadminReports() {
       </div>
 
       <div className="bg-surface-card rounded-2xl border border-border overflow-hidden shadow-sm">
-        <div className="p-4 border-b border-border bg-surface-secondary/50 flex justify-between items-center">
-          <h2 className="font-semibold text-content-primary">Daftar Laporan Pengguna</h2>
+        <div className="p-4 border-b border-border bg-surface-secondary/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex bg-surface-primary p-1 rounded-xl w-fit border border-border">
+            <button
+              onClick={() => setFilterType('all')}
+              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                filterType === 'all' ? 'bg-surface-card text-red-500 shadow-sm' : 'text-content-secondary hover:text-content-primary'
+              }`}
+            >
+              Semua
+            </button>
+            <button
+              onClick={() => setFilterType('toko')}
+              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                filterType === 'toko' ? 'bg-surface-card text-red-500 shadow-sm' : 'text-content-secondary hover:text-content-primary'
+              }`}
+            >
+              Laporan Toko/Produk
+            </button>
+            <button
+              onClick={() => setFilterType('website')}
+              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                filterType === 'website' ? 'bg-surface-card text-red-500 shadow-sm' : 'text-content-secondary hover:text-content-primary'
+              }`}
+            >
+              Laporan Website
+            </button>
+          </div>
           <Button variant="outline" size="sm" onClick={fetchReports} disabled={isLoading}>
             Refresh
           </Button>
@@ -84,15 +146,17 @@ export default function SuperadminReports() {
             <Skeleton className="h-16 w-full rounded-card" />
             <Skeleton className="h-16 w-full rounded-card" />
           </div>
-        ) : reports.length === 0 ? (
+        ) : filteredReports.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center justify-center">
             <CheckCircle size={48} className="text-green-500 mb-4 opacity-80" />
-            <h3 className="text-lg font-bold text-content-primary">Semua Aman!</h3>
-            <p className="text-content-secondary mt-1">Belum ada laporan masuk dari pengguna.</p>
+            <h3 className="text-lg font-bold text-content-primary">
+              {filterType === 'website' ? 'Tidak Ada Kendala Website!' : filterType === 'toko' ? 'Toko & Produk Aman!' : 'Semua Aman!'}
+            </h3>
+            <p className="text-content-secondary mt-1">Belum ada laporan masuk di kategori ini.</p>
           </div>
         ) : (
           <div className="divide-y divide-border">
-            {reports.map((report) => (
+            {filteredReports.map((report) => (
               <div key={report.id} className="p-4 hover:bg-surface-secondary/30 transition-colors flex flex-col md:flex-row gap-4 justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -111,6 +175,9 @@ export default function SuperadminReports() {
                   <h3 className="font-bold text-content-primary text-sm mt-2">
                     Laporan: {report.target_type.toUpperCase()}
                   </h3>
+                  {report.target_type !== 'website' && report.target_type !== 'user' && report.target_name && (
+                    <p className="text-xs text-orange-600 dark:text-orange-400 font-medium">Target: {report.target_name}</p>
+                  )}
                   <p className="text-content-secondary text-sm mt-1 mb-2 bg-surface-secondary p-3 rounded-button italic border border-border/50">
                     "{report.reason}"
                   </p>
