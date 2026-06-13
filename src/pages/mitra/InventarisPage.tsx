@@ -196,34 +196,69 @@ export default function InventarisPage() {
               <Card key={product.id} className="p-3 border-border hover:border-primary-500/50 transition-colors flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                 {/* Thumbnail & Title (Mobile) */}
                 <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <div className="w-16 h-16 rounded-lg bg-surface-secondary overflow-hidden shrink-0 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-lg bg-surface-secondary overflow-hidden shrink-0 flex items-center justify-center relative">
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                     ) : (
                       <Package size={24} className="text-content-placeholder" />
                     )}
+                    {product.discount_percentage > 0 && (
+                      <div className="absolute top-0 left-0 bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-br-lg z-10 shadow-sm">
+                        -{product.discount_percentage}%
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0 sm:hidden">
-                    <h3 className="font-bold text-content-primary text-sm truncate">{product.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm font-bold text-primary-500">{formatRupiah(product.price)}</span>
-                      <div className="w-1 h-1 bg-border rounded-full shrink-0" />
-                      <span className="text-[10px] text-content-placeholder uppercase font-bold shrink-0 truncate">
-                        Stok: {product.daily_stock ?? '∞'}
-                      </span>
+                    <h3 className="font-bold text-content-primary text-sm truncate leading-tight">{product.name}</h3>
+                    <div className="flex flex-col mt-1">
+                      {product.discount_percentage > 0 ? (
+                        <>
+                          <span className="text-[10px] font-medium text-content-placeholder line-through decoration-red-500/50 mb-0.5">
+                            {formatRupiah(product.price)}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-black text-red-500">
+                              {formatRupiah(product.price - (product.price * product.discount_percentage / 100))}
+                            </span>
+                            <div className="w-1 h-1 bg-border rounded-full shrink-0" />
+                            <span className="text-[10px] text-content-placeholder uppercase font-bold shrink-0 truncate">Stok: {product.daily_stock ?? '∞'}</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-black text-primary-500">{formatRupiah(product.price)}</span>
+                          <div className="w-1 h-1 bg-border rounded-full shrink-0" />
+                          <span className="text-[10px] text-content-placeholder uppercase font-bold shrink-0 truncate">Stok: {product.daily_stock ?? '∞'}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Info (Desktop) */}
                 <div className="hidden sm:block flex-1 min-w-0">
-                  <h3 className="font-bold text-content-primary text-sm truncate">{product.name}</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-sm font-bold text-primary-500 shrink-0">{formatRupiah(product.price)}</span>
-                    <div className="w-1 h-1 bg-border rounded-full shrink-0" />
-                    <span className="text-[10px] text-content-placeholder uppercase font-bold shrink-0">
-                      Stok: {product.daily_stock ?? '∞'}
-                    </span>
+                  <h3 className="font-bold text-content-primary text-sm truncate leading-tight">{product.name}</h3>
+                  <div className="flex flex-col mt-1">
+                    {product.discount_percentage > 0 ? (
+                      <>
+                        <span className="text-[10px] font-medium text-content-placeholder line-through decoration-red-500/50 mb-0.5">
+                          {formatRupiah(product.price)}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-black text-red-500 shrink-0">
+                            {formatRupiah(product.price - (product.price * product.discount_percentage / 100))}
+                          </span>
+                          <div className="w-1 h-1 bg-border rounded-full shrink-0" />
+                          <span className="text-[10px] text-content-placeholder uppercase font-bold shrink-0">Stok: {product.daily_stock ?? '∞'}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-black text-primary-500 shrink-0">{formatRupiah(product.price)}</span>
+                        <div className="w-1 h-1 bg-border rounded-full shrink-0" />
+                        <span className="text-[10px] text-content-placeholder uppercase font-bold shrink-0">Stok: {product.daily_stock ?? '∞'}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -288,18 +323,17 @@ export default function InventarisPage() {
           isOpen={isFormOpen} 
           onClose={() => setIsFormOpen(false)}
           title={editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}
+          noPadding
         >
-          <div className="p-0">
-            <ProductForm 
-              umkmId={umkm?.id} 
-              initialData={editingProduct}
-              onCancel={() => setIsFormOpen(false)}
-              onSuccess={() => {
-                setIsFormOpen(false);
-                fetchData();
-              }}
-            />
-          </div>
+          <ProductForm 
+            umkmId={umkm?.id} 
+            initialData={editingProduct}
+            onCancel={() => setIsFormOpen(false)}
+            onSuccess={() => {
+              setIsFormOpen(false);
+              fetchData();
+            }}
+          />
         </Modal>
 
         {/* Modal: Confirm Delete */}

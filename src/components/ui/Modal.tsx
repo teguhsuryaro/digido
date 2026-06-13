@@ -6,6 +6,7 @@ interface ModalProps {
   title?: string;
   children: ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  noPadding?: boolean;
 }
 
 const sizeClasses = {
@@ -22,6 +23,7 @@ export default function Modal({
   title,
   children,
   size = 'md',
+  noPadding = false,
 }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -58,13 +60,14 @@ export default function Modal({
           bg-surface-card rounded-card shadow-modal
           border border-border
           animate-in zoom-in-95 duration-200
+          flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden
         `}
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
       >
         {title && (
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
             <h2 id="modal-title" className="text-lg font-semibold text-content-primary">
               {title}
             </h2>
@@ -79,7 +82,9 @@ export default function Modal({
             </button>
           </div>
         )}
-        <div className="px-5 py-4">{children}</div>
+        <div className={noPadding ? 'flex flex-col flex-1 min-h-0 overflow-hidden' : 'overflow-y-auto px-5 py-4'}>
+          {children}
+        </div>
       </div>
     </div>
   );
