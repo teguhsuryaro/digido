@@ -90,7 +90,15 @@ export default function SuperadminLayout() {
             <ShieldAlert size={16} className="text-red-600 dark:text-red-400" />
             <span className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Superadmin Mode</span>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button 
+              onClick={() => setIsLogoutModalOpen(true)}
+              className="p-1.5 text-content-secondary hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
         </header>
 
         <div className="w-full max-w-5xl mx-auto px-4 py-6 md:px-8">
@@ -100,7 +108,7 @@ export default function SuperadminLayout() {
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-card border-t border-border z-40">
-        <div className="flex items-center h-16 pb-safe-bottom px-2 overflow-x-auto scrollbar-hide justify-around">
+        <div className="flex items-center justify-around h-16 pb-safe-bottom px-2 w-full">
           {sidenavItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -116,20 +124,13 @@ export default function SuperadminLayout() {
               >
                 {({ isActive }) => (
                   <>
-                    <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
-                    <span className="text-[10px] font-bold text-center leading-tight truncate w-full px-1">{item.shortLabel}</span>
+                    <Icon size={18} strokeWidth={isActive ? 2.5 : 1.5} />
+                    <span className="text-[9px] font-bold text-center leading-tight truncate w-full px-1">{item.shortLabel}</span>
                   </>
                 )}
               </NavLink>
             );
           })}
-          <button
-            onClick={() => setIsLogoutModalOpen(true)}
-            className="flex flex-col items-center justify-center gap-1 w-16 shrink-0 transition-colors text-content-secondary hover:text-red-500"
-          >
-            <LogOut size={20} strokeWidth={1.5} />
-            <span className="text-[10px] font-bold">Keluar</span>
-          </button>
         </div>
       </nav>
 
