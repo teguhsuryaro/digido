@@ -486,6 +486,10 @@ export default function OrderDetailPage() {
                   <span className="text-content-secondary">Ongkos Kirim</span>
                   <span className="font-medium text-content-primary">{formatRupiah(order.delivery_fee)}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-content-secondary">Biaya Admin DigiDO</span>
+                  <span className="font-medium text-content-primary">{formatRupiah(order.admin_fee || 500)}</span>
+                </div>
                 {order.wallet_deduction > 0 && (
                   <div className="flex justify-between text-green-600 font-bold dark:text-green-400">
                     <span>Potongan Dompet</span>
