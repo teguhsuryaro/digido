@@ -45,7 +45,6 @@ export default function MitraProfilePage() {
           .from('umkm')
           .select('id, name, description, photo_url, whatsapp_number, is_verified')
           .eq('owner_id', user.id)
-          .eq('is_active', true)
           .single();
 
         if (error) throw error;
