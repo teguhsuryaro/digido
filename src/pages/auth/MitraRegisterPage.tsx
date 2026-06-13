@@ -152,6 +152,7 @@ export default function MitraRegisterPage() {
           withdrawal_method: data.withdrawalMethod,
           withdrawal_provider: data.withdrawalProvider,
           withdrawal_account: data.withdrawalAccount,
+          approval_status: 'pending',
           is_open: false,
           has_delivery: false,
           is_active: false,
@@ -235,37 +236,32 @@ export default function MitraRegisterPage() {
         fee_type: 'free',
       } as any);
 
-      // 5. Update role ke mitra dan set nomor handphone jika sebelumnya kosong
-      const profileUpdates: any = { role: 'mitra' };
+      // 5. Set nomor handphone di profil jika sebelumnya kosong
       if (!profile?.phone) {
-        profileUpdates.phone = data.phoneNumber;
+        await supabase
+          .from('profiles')
+          .update({ phone: data.phoneNumber } as any)
+          .eq('id', user.id);
       }
 
-      await supabase
-        .from('profiles')
-        .update(profileUpdates)
-        .eq('id', user.id);
-
-      // 5.5. Set is_active = true and complete the registration
+      // 5.5. Selesaikan step registrasi tanpa mengaktifkan is_active
       await supabase
         .from('umkm')
         .update({ 
-          is_active: true,
           registration_completed_at: new Date().toISOString()
         } as any)
         .eq('id', umkmId);
 
-      // 6. Update local profile store
-      if (profile) {
+      // 6. Update local profile store (hanya phone, tidak ganti role)
+      if (profile && !profile.phone) {
         setProfile({ 
           ...profile, 
-          role: 'mitra',
-          ...( !profile.phone ? { phone: data.phoneNumber } : {} )
+          phone: data.phoneNumber
         });
       }
 
-      toast.success('Pendaftaran mitra berhasil! Selamat berjualan.');
-      navigate('/mitra');
+      toast.success('Pendaftaran mitra berhasil dikirim dan menunggu persetujuan admin.');
+      navigate('/profil');
     } catch (err: any) {
       if (umkmId) {
         // CLEANUP: Hapus UMKM jika proses pendaftaran gagal di tengah jalan

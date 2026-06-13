@@ -25,6 +25,7 @@ export default function ProfilePage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isLoadingWallet, setIsLoadingWallet] = useState(true);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [umkmStatus, setUmkmStatus] = useState<'none' | 'pending' | 'rejected' | 'approved'>('none');
 
   useEffect(() => {
     if (profile) {
@@ -52,8 +53,27 @@ export default function ProfilePage() {
       }
     };
 
+    const fetchUmkmStatus = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('umkm')
+          .select('approval_status')
+          .eq('owner_id', user.id)
+          .maybeSingle();
+
+        if (!error && data) {
+          setUmkmStatus((data as any).approval_status || 'pending');
+        }
+      } catch (err) {
+        console.error('UMKM status fetch error:', err);
+      }
+    };
+
     fetchWallet();
-  }, [user]);
+    if (profile?.role === 'pelanggan') {
+      fetchUmkmStatus();
+    }
+  }, [user, profile]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -260,23 +280,31 @@ export default function ProfilePage() {
             <Card className="divide-y divide-border overflow-hidden">
               
               {/* Mitra Link */}
-              {profile?.role === 'pelanggan' ? (
+              {profile?.role === 'pelanggan' && umkmStatus !== 'approved' ? (
                 <button 
-                  onClick={() => navigate('/daftar-mitra')}
-                  className="w-full p-4 flex items-center justify-between hover:bg-surface-secondary transition-colors"
+                  onClick={() => {
+                    if (umkmStatus === 'pending') return;
+                    navigate('/daftar-mitra');
+                  }}
+                  className={`w-full p-4 flex items-center justify-between transition-colors ${umkmStatus === 'pending' ? 'opacity-60 cursor-not-allowed bg-surface-secondary' : 'hover:bg-surface-secondary'}`}
+                  disabled={umkmStatus === 'pending'}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 flex items-center justify-center shrink-0">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${umkmStatus === 'pending' ? 'bg-gray-100 text-gray-500 dark:bg-gray-800' : umkmStatus === 'rejected' ? 'bg-red-100 text-red-600 dark:bg-red-900/30' : 'bg-orange-100 text-orange-600 dark:bg-orange-900/30'}`}>
                       <Store size={20} />
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-bold text-content-primary">Daftar sebagai Mitra</p>
-                      <p className="text-[10px] text-content-secondary">Mulai jualan produk UMKM Anda</p>
+                      <p className={`text-sm font-bold ${umkmStatus === 'pending' ? 'text-content-secondary' : umkmStatus === 'rejected' ? 'text-red-600 dark:text-red-400' : 'text-content-primary'}`}>
+                        {umkmStatus === 'pending' ? 'Menunggu Persetujuan Mitra' : umkmStatus === 'rejected' ? 'Daftar Ulang Mitra' : 'Daftar sebagai Mitra'}
+                      </p>
+                      <p className="text-[10px] text-content-secondary">
+                        {umkmStatus === 'pending' ? 'Tim kami sedang meninjau data Anda' : umkmStatus === 'rejected' ? 'Pendaftaran sebelumnya ditolak' : 'Mulai jualan produk UMKM Anda'}
+                      </p>
                     </div>
                   </div>
-                  <span className="text-content-placeholder"><ChevronRight size={16} /></span>
+                  {umkmStatus !== 'pending' && <span className="text-content-placeholder"><ChevronRight size={16} /></span>}
                 </button>
-              ) : (
+              ) : profile?.role === 'mitra' || profile?.role === 'superadmin' ? (
                 <>
                   <button 
                     onClick={() => navigate('/mitra')}
@@ -309,7 +337,7 @@ export default function ProfilePage() {
                     <span className="text-content-placeholder"><ChevronRight size={16} /></span>
                   </button>
                 </>
-              )}
+              ) : null}
 
               {/* Theme Toggle */}
               <div className="w-full p-4 flex items-center justify-between border-b border-border hover:bg-surface-secondary/50 transition-colors">
