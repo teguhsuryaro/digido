@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, MapPin, Truck, Gift } from 'lucide-react';
+import { Star, MapPin, Truck, Gift, Flag } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { formatRupiah } from '@/utils/format';
 import { toast } from '@/components/ui/Toast';
@@ -135,14 +135,23 @@ export default function UMKMDetailPage() {
     <PageTransition>
       <div className="space-y-8 pb-20 md:pb-8">
         {/* Header Section — Full-Width */}
-        <section className="bg-surface-card rounded-card p-6 border border-border shadow-sm">
-          <div className="flex justify-between items-start gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-content-primary leading-tight">{umkm.name}</h1>
-              <p className="text-content-secondary mt-1 font-medium">{umkm.business_type}</p>
+        <section className="bg-surface-card rounded-card p-4 sm:p-6 border border-border shadow-sm">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+            <div className="w-full sm:w-auto">
+              <div className="flex items-start justify-between sm:block gap-2 w-full">
+                <h1 className="text-xl sm:text-3xl font-extrabold text-content-primary leading-tight">{umkm.name}</h1>
+                <span className={`sm:hidden shrink-0 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  umkm.is_open 
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                }`}>
+                  {umkm.is_open ? 'Buka' : 'Tutup'}
+                </span>
+              </div>
+              <p className="text-content-secondary mt-1 text-sm font-medium">{umkm.business_type}</p>
             </div>
-            <div className="flex flex-col items-end gap-2">
-              <span className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0">
+              <span className={`hidden sm:inline-block shrink-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                 umkm.is_open 
                   ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
                   : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
@@ -151,42 +160,46 @@ export default function UMKMDetailPage() {
               </span>
               <button 
                 onClick={() => setIsReportModalOpen(true)}
-                className="text-xs text-content-placeholder hover:text-red-500 transition-colors flex items-center gap-1 font-medium"
+                className="px-3 py-1.5 rounded-lg border border-border bg-surface-secondary hover:bg-red-50 hover:border-red-200 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:border-red-900/30 text-xs text-content-secondary transition-colors flex items-center gap-1.5 font-medium ml-auto sm:ml-0"
               >
-                Laporkan Toko
+                <Flag size={14} />
+                <span>Laporkan Toko</span>
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 mt-4 text-sm flex-wrap">
+          <div className="flex items-center gap-3 mt-5 flex-wrap">
             {/* Rating — Clickable ke halaman ulasan */}
             <button
               onClick={() => navigate(`/umkm/${id}/ulasan`)}
-              className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer"
+              className="flex items-center gap-2 px-3 py-1.5 bg-surface-secondary hover:bg-surface-secondary/80 border border-border hover:border-primary-500/30 rounded-full transition-all cursor-pointer group"
               title="Lihat semua ulasan"
             >
-              <Star size={16} className="text-yellow-500 fill-yellow-500" />
-              <span className="font-bold text-content-primary">{avgRating.toFixed(1)}</span>
-              <span className="text-content-placeholder underline">({ratings.length} ulasan)</span>
+              <div className="flex items-center gap-1">
+                <Star size={14} className="text-yellow-500 fill-yellow-500 group-hover:scale-110 transition-transform" />
+                <span className="font-bold text-content-primary text-sm">{avgRating.toFixed(1)}</span>
+              </div>
+              <div className="w-1 h-1 bg-border rounded-full" />
+              <span className="text-xs text-content-secondary font-medium group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                {ratings.length} Ulasan
+              </span>
             </button>
             
             {distanceText && (
-              <>
-                <div className="w-1 h-1 bg-border rounded-full hidden sm:block" />
-                <span className="text-content-secondary flex items-center gap-1.5 cursor-default font-medium">
-                  <MapPin size={14} className="text-primary-500" /> {distanceText}
-                </span>
-              </>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-secondary border border-border rounded-full">
+                <MapPin size={14} className="text-primary-500" />
+                <span className="text-xs text-content-secondary font-medium">{distanceText}</span>
+              </div>
             )}
           </div>
 
-          <p className="mt-4 text-content-secondary leading-relaxed text-sm sm:text-base">
+          <div className="mt-5 text-content-secondary leading-relaxed text-sm bg-surface-secondary/50 p-4 rounded-xl border border-border/50">
             {umkm.description}
-          </p>
+          </div>
         </section>
 
         {/* Responsive Layout — Desktop 2-column, Mobile stacked */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           
           {/* Left Column — Info, Maps, Delivery (1/3 weight) */}
           <div className="lg:col-span-1 space-y-6">
