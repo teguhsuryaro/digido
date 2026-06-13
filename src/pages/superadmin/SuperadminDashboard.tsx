@@ -35,15 +35,38 @@ export default function SuperadminDashboard() {
           .select('*', { count: 'exact', head: true })
           .in('status', ['open', 'reviewed']);
 
+        // 1. Revenue dari transaksi
         const { data: completedData, count: completedOrders } = await supabase
           .from('orders')
           .select('admin_fee', { count: 'exact' })
           .eq('status', 'completed');
           
-        const totalRevenue = ((completedData as any[]) || []).reduce((sum, order) => {
-          // Fallback to 0 if admin_fee is null/undefined
-          return sum + (order.admin_fee || 0);
+        const ordersRevenue = ((completedData as any[]) || []).reduce((sum, order) => {
+          // Fallback ke 500 jika admin_fee null/0 untuk sinkron dengan RevenuePage
+          return sum + ((order.admin_fee && order.admin_fee > 0) ? order.admin_fee : 500);
         }, 0);
+
+        // 2. Revenue dari penarikan dana
+        const { data: withdrawalsData } = await supabase
+          .from('withdrawals')
+          .select('admin_fee')
+          .eq('status', 'completed');
+          
+        const wdRevenue = ((withdrawalsData as any[]) || []).reduce((sum, wd) => {
+          return sum + (wd.admin_fee || 0);
+        }, 0);
+
+        // 3. Revenue dari pembelian paket
+        const { data: subsData } = await supabase
+          .from('subscriptions')
+          .select('subscription_plans(price)')
+          .neq('status', 'failed');
+          
+        const subsRevenue = ((subsData as any[]) || []).reduce((sum, sub) => {
+          return sum + (sub.subscription_plans?.price || 0);
+        }, 0);
+
+        const totalRevenue = ordersRevenue + wdRevenue + subsRevenue;
 
         setStats({
           totalUsers: totalUsers || 0,
