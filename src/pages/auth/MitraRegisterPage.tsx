@@ -24,6 +24,9 @@ interface UMKMFormData {
   ktpFile: File | null;
   businessPhotoFile: File | null;
   qrisFile: File | null;
+  withdrawalMethod: 'qris' | 'ewallet' | 'bank' | '';
+  withdrawalProvider: string;
+  withdrawalAccount: string;
   faqs: Array<{ question: string; answer: string }>;
 }
 
@@ -33,6 +36,7 @@ const INITIAL_DATA: UMKMFormData = {
   shopPhotoFile: null,
   phoneNumber: '',
   ktpFile: null, businessPhotoFile: null, qrisFile: null,
+  withdrawalMethod: '', withdrawalProvider: '', withdrawalAccount: '',
   faqs: [
     { question: 'Apa menu andalan di sini?', answer: '' },
     { question: 'Apakah menerima pesanan partai besar?', answer: '' },
@@ -84,8 +88,20 @@ export default function MitraRegisterPage() {
     }
     // Validation for Step 1
     if (step === 1) {
-      if (!data.ktpFile || !data.businessPhotoFile || !data.qrisFile) {
-        toast.warning('Mohon unggah semua dokumen yang diperlukan.');
+      if (!data.ktpFile || !data.businessPhotoFile) {
+        toast.warning('Mohon unggah KTP dan Foto Tempat Usaha.');
+        return;
+      }
+      if (!data.withdrawalMethod) {
+        toast.warning('Mohon pilih metode pencairan dana.');
+        return;
+      }
+      if (data.withdrawalMethod === 'qris' && !data.qrisFile) {
+        toast.warning('Mohon unggah gambar QRIS pencairan dana.');
+        return;
+      }
+      if (data.withdrawalMethod !== 'qris' && (!data.withdrawalProvider || !data.withdrawalAccount)) {
+        toast.warning('Mohon lengkapi detail pencairan dana (Provider & Nomor Akun).');
         return;
       }
     }
@@ -133,6 +149,9 @@ export default function MitraRegisterPage() {
           latitude: data.latitude,
           longitude: data.longitude,
           whatsapp_number: data.phoneNumber,
+          withdrawal_method: data.withdrawalMethod,
+          withdrawal_provider: data.withdrawalProvider,
+          withdrawal_account: data.withdrawalAccount,
           is_open: false,
           has_delivery: false,
           is_active: false,
@@ -440,25 +459,112 @@ export default function MitraRegisterPage() {
                 </div>
               </div>
 
-              {/* QRIS */}
-              <div className="space-y-2">
-                <p className="text-xs font-bold uppercase tracking-widest text-content-secondary">Gambar QRIS Pembayaran</p>
-                <div 
-                  onClick={() => qrisInputRef.current?.click()}
-                  className={`h-40 rounded-card border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-colors overflow-hidden relative ${data.qrisFile ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20' : 'border-border bg-surface-secondary hover:border-primary-500'}`}
-                >
-                  {data.qrisFile ? (
-                    <p className="text-xs font-bold text-primary-500 flex items-center gap-1">
-                      <CheckCircle size={14} /> QRIS Terpilih
-                    </p>
-                  ) : (
-                    <>
-                      <QrCode size={28} className="text-content-placeholder mb-1" />
-                      <span className="text-[10px] font-bold text-content-placeholder">KLIK UNTUK UPLOAD QRIS</span>
-                    </>
-                  )}
+              {/* Pencairan Dana */}
+              <div className="space-y-4 pt-2 border-t border-border mt-4">
+                <div className="space-y-1">
+                  <p className="text-xs font-bold uppercase tracking-widest text-content-secondary">Pilih Metode Pencairan Dana Pendapatan</p>
+                  <p className="text-[10px] text-content-placeholder">Digunakan saat Anda menarik saldo dari dompet DigiDO.</p>
                 </div>
-                <input type="file" ref={qrisInputRef} className="hidden" accept="image/*" onChange={(e) => setData({ ...data, qrisFile: e.target.files?.[0] || null })} />
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div 
+                    onClick={() => setData({ ...data, withdrawalMethod: 'qris', withdrawalProvider: '', withdrawalAccount: '' })}
+                    className={`p-3 rounded-card border-2 cursor-pointer transition-all flex flex-col items-center justify-center text-center gap-1 ${data.withdrawalMethod === 'qris' ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20' : 'border-border bg-surface-secondary hover:border-primary-300'}`}
+                  >
+                    <QrCode size={20} className={data.withdrawalMethod === 'qris' ? 'text-primary-500' : 'text-content-secondary'} />
+                    <span className="text-xs font-bold mt-1">QRIS</span>
+                    <span className="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full mt-1">Gratis Admin</span>
+                  </div>
+
+                  <div 
+                    onClick={() => setData({ ...data, withdrawalMethod: 'ewallet', withdrawalProvider: '', withdrawalAccount: '' })}
+                    className={`p-3 rounded-card border-2 cursor-pointer transition-all flex flex-col items-center justify-center text-center gap-1 ${data.withdrawalMethod === 'ewallet' ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20' : 'border-border bg-surface-secondary hover:border-primary-300'}`}
+                  >
+                    <Store size={20} className={data.withdrawalMethod === 'ewallet' ? 'text-primary-500' : 'text-content-secondary'} />
+                    <span className="text-xs font-bold mt-1">E-Wallet</span>
+                    <span className="text-[9px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full mt-1">Potongan Rp2.500</span>
+                  </div>
+
+                  <div 
+                    onClick={() => setData({ ...data, withdrawalMethod: 'bank', withdrawalProvider: '', withdrawalAccount: '' })}
+                    className={`p-3 rounded-card border-2 cursor-pointer transition-all flex flex-col items-center justify-center text-center gap-1 ${data.withdrawalMethod === 'bank' ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20' : 'border-border bg-surface-secondary hover:border-primary-300'}`}
+                  >
+                    <FileText size={20} className={data.withdrawalMethod === 'bank' ? 'text-primary-500' : 'text-content-secondary'} />
+                    <span className="text-xs font-bold mt-1">Transfer Bank</span>
+                    <span className="text-[9px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full mt-1">Potongan Rp4.000</span>
+                  </div>
+                </div>
+
+                {data.withdrawalMethod === 'qris' && (
+                  <div className="space-y-2 animate-in fade-in zoom-in-95 duration-300 mt-4">
+                    <p className="text-xs font-bold uppercase tracking-widest text-content-secondary">Upload Gambar QRIS</p>
+                    <div 
+                      onClick={() => qrisInputRef.current?.click()}
+                      className={`h-40 rounded-card border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-colors overflow-hidden relative ${data.qrisFile ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20' : 'border-border bg-surface-secondary hover:border-primary-500'}`}
+                    >
+                      {data.qrisFile ? (
+                        <p className="text-xs font-bold text-primary-500 flex items-center gap-1">
+                          <CheckCircle size={14} /> QRIS Terpilih
+                        </p>
+                      ) : (
+                        <>
+                          <QrCode size={28} className="text-content-placeholder mb-1" />
+                          <span className="text-[10px] font-bold text-content-placeholder">KLIK UNTUK UPLOAD QRIS</span>
+                        </>
+                      )}
+                    </div>
+                    <input type="file" ref={qrisInputRef} className="hidden" accept="image/*" onChange={(e) => setData({ ...data, qrisFile: e.target.files?.[0] || null })} />
+                  </div>
+                )}
+
+                {data.withdrawalMethod === 'ewallet' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in zoom-in-95 duration-300 mt-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-content-secondary uppercase tracking-widest px-1">Pilih E-Wallet</label>
+                      <select 
+                        className="w-full p-4 rounded-card bg-surface-secondary border border-border text-sm outline-none focus:ring-2 focus:ring-primary-500/20"
+                        value={data.withdrawalProvider}
+                        onChange={(e) => setData({ ...data, withdrawalProvider: e.target.value })}
+                      >
+                        <option value="">Pilih E-Wallet</option>
+                        <option value="gopay">GoPay</option>
+                        <option value="ovo">OVO</option>
+                        <option value="dana">DANA</option>
+                      </select>
+                    </div>
+                    <Input
+                      label="Nomor E-Wallet"
+                      placeholder="Contoh: 081234567890"
+                      value={data.withdrawalAccount}
+                      onChange={(e) => setData({ ...data, withdrawalAccount: e.target.value })}
+                    />
+                  </div>
+                )}
+
+                {data.withdrawalMethod === 'bank' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in zoom-in-95 duration-300 mt-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-content-secondary uppercase tracking-widest px-1">Pilih Bank</label>
+                      <select 
+                        className="w-full p-4 rounded-card bg-surface-secondary border border-border text-sm outline-none focus:ring-2 focus:ring-primary-500/20"
+                        value={data.withdrawalProvider}
+                        onChange={(e) => setData({ ...data, withdrawalProvider: e.target.value })}
+                      >
+                        <option value="">Pilih Bank</option>
+                        <option value="bca">BCA</option>
+                        <option value="bri">BRI</option>
+                        <option value="bsi">BSI</option>
+                        <option value="seabank">SeaBank</option>
+                      </select>
+                    </div>
+                    <Input
+                      label="Nomor Rekening"
+                      placeholder="Contoh: 1234567890"
+                      value={data.withdrawalAccount}
+                      onChange={(e) => setData({ ...data, withdrawalAccount: e.target.value })}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -520,12 +626,15 @@ export default function MitraRegisterPage() {
 
               <section className="space-y-2">
                 <p className="text-xs font-bold uppercase tracking-widest text-content-placeholder px-1">Dokumen Terlampir</p>
-                <div className="flex gap-2">
-                  {['KTP', 'Foto Usaha', 'QRIS'].map(doc => (
-                    <div key={doc} className="flex-1 py-2 px-3 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 text-[10px] font-bold rounded-full text-center border border-green-100 dark:border-green-900/30">
+                <div className="flex flex-wrap gap-2">
+                  {['KTP', 'Foto Usaha'].map(doc => (
+                    <div key={doc} className="py-2 px-3 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 text-[10px] font-bold rounded-full text-center border border-green-100 dark:border-green-900/30">
                       ✅ {doc} Siap
                     </div>
                   ))}
+                  <div className="py-2 px-3 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 text-[10px] font-bold rounded-full text-center border border-blue-100 dark:border-blue-900/30 flex-1 min-w-max">
+                    💵 Pencairan: {data.withdrawalMethod.toUpperCase()} {data.withdrawalMethod !== 'qris' && `(${data.withdrawalProvider.toUpperCase()})`}
+                  </div>
                 </div>
               </section>
 
