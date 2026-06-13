@@ -144,7 +144,7 @@ export default function InventarisPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-10 w-48 mb-4" />
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6">
           {[1, 2, 3, 4, 5, 6].map(i => (
             <Skeleton key={i} className="h-24 w-full rounded-card" />
           ))}
@@ -191,9 +191,9 @@ export default function InventarisPage() {
 
         {/* Product Grid Layout */}
         {products.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6">
             {products.map((product) => (
-              <Card key={product.id} className="p-3 border-border hover:border-primary-500/50 transition-colors flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+              <Card key={product.id} className="p-4 border-border hover:border-primary-500/50 transition-colors flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 {/* Thumbnail & Title (Mobile) */}
                 <div className="flex items-center gap-3 w-full sm:w-auto">
                   <div className="w-16 h-16 rounded-lg bg-surface-secondary overflow-hidden shrink-0 flex items-center justify-center relative">
@@ -263,7 +263,7 @@ export default function InventarisPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/30">
+                <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/30 shrink-0">
                   <span className="text-[10px] font-bold text-content-secondary uppercase sm:hidden">
                     {product.is_available ? 'Tersedia' : 'Habis'}
                   </span>
