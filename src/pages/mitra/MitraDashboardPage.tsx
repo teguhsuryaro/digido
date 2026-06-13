@@ -39,18 +39,19 @@ export default function MitraDashboardPage() {
         const totalProducts = products?.length || 0;
         const lowStockProducts = products?.filter((p: any) => p.is_available && p.daily_stock !== null && p.daily_stock <= 5).length || 0;
 
-        // 3. Get Today's Orders
+        // 3. Get Today's Orders (only completed, to match FinansialPage)
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
         const { data: orders } = (await supabase
           .from('orders')
-          .select('id, total_amount, status')
+          .select('id, total, admin_fee, status')
           .eq('umkm_id', umkm.id)
+          .eq('status', 'completed')
           .gte('created_at', today.toISOString())) as any;
 
         const todayOrders = orders?.length || 0;
-        const todayRevenue = orders?.filter((o: any) => o.status === 'completed' || o.status === 'accepted' || o.status === 'ready').reduce((sum: number, o: any) => sum + o.total_amount, 0) || 0;
+        const todayRevenue = orders?.reduce((sum: number, o: any) => sum + (o.total - (o.admin_fee || 500)), 0) || 0;
 
         setStats({
           todayOrders,
