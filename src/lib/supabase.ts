@@ -16,5 +16,6 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,       // Otomatis refresh token sebelum expire
     persistSession: true,         // Simpan session di localStorage
     detectSessionInUrl: true,     // Untuk OAuth callback (jika nanti dipakai)
+    storageKey: 'digido-auth',    // Key spesifik agar tidak bentrok
   },
 });

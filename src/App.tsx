@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -42,114 +42,164 @@ function PageLoader() {
   );
 }
 
+/** Helper: cek apakah error bersifat sementara (network/fetch) */
+function isTransientError(err: any): boolean {
+  if (!err) return false;
+  const msg = (err.message || err.toString() || '').toLowerCase();
+  return msg.includes('fetch') || msg.includes('network') || msg.includes('failed to fetch')
+    || msg.includes('load failed') || msg.includes('networkerror') || msg.includes('aborterror')
+    || msg.includes('timeout');
+}
+
+/** Helper: ambil profile dari DB, dengan retry untuk network error */
+async function fetchProfile(userId: string, retries = 2): Promise<any | null> {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (error) {
+        if (isTransientError(error) && i < retries) {
+          await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+          continue;
+        }
+        throw error;
+      }
+      return data;
+    } catch (err) {
+      if (isTransientError(err) && i < retries) {
+        await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+        continue;
+      }
+      throw err;
+    }
+  }
+  return null;
+}
+
 export default function App() {
   useGlobalErrorHandler();
   const { setAuth, setProfile, setInitialized, setLoading } = useAuthStore();
+  const isRecoveringRef = useRef(false);
 
-  useEffect(() => {
-    // 1. Cek session yang sudah ada
-    const initAuth = async (retryCount = 0) => {
-      try {
-        if (retryCount === 0) setLoading(true);
-        const { data: { session }, error } = await supabase.auth.getSession();
+  /**
+   * Fungsi utama untuk memuat/memvalidasi sesi.
+   * Digunakan saat init, visibility change, dan heartbeat.
+   */
+  const loadSession = useCallback(async (opts?: { silent?: boolean; isRetry?: boolean }) => {
+    const { silent = false, isRetry = false } = opts || {};
 
-        if (error) {
-          // Deteksi network error
-          const isNetworkError = error.message.toLowerCase().includes('fetch') || error.message.toLowerCase().includes('network');
-          if (isNetworkError && retryCount < 3) {
-            console.warn(`Koneksi database gagal. Mencoba ulang... (${retryCount + 1}/3)`);
-            toast.warning(`Koneksi terputus. Mencoba ulang... (${retryCount + 1}/3)`);
-            setTimeout(() => initAuth(retryCount + 1), 2000 * Math.pow(2, retryCount));
-            return; // Tunggu eksekusi berikutnya
+    // Cegah multiple concurrent recovery
+    if (isRecoveringRef.current && !isRetry) return;
+    isRecoveringRef.current = true;
+
+    try {
+      if (!silent) setLoading(true);
+
+      // Coba ambil session dari Supabase (termasuk refresh token jika expired)
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        // Jika network error, jangan langsung logout — biarkan user lihat data lama
+        if (isTransientError(sessionError)) {
+          console.warn('[Auth] Network error saat getSession, menunggu koneksi pulih...');
+          if (!silent) {
+            toast.warning('Koneksi terputus. Mencoba menyambung kembali...');
           }
-          throw error;
+          // Tetap set initialized agar UI tidak stuck di "Memuat..."
+          setInitialized(true);
+          return;
         }
+        // Error non-network (misal: refresh token invalid) → logout graceful
+        console.error('[Auth] Session error (non-network):', sessionError.message);
+        throw sessionError;
+      }
 
-        if (session?.user) {
-          // Ambil profile dari database
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .maybeSingle();
-
-          if (profileError) {
-             const isNetworkError = profileError.message.toLowerCase().includes('fetch') || profileError.message.toLowerCase().includes('network');
-             if (isNetworkError && retryCount < 3) {
-               console.warn(`Gagal memuat profil. Mencoba ulang... (${retryCount + 1}/3)`);
-               setTimeout(() => initAuth(retryCount + 1), 2000 * Math.pow(2, retryCount));
-               return;
-             }
-             throw profileError;
-          }
-
+      if (session?.user) {
+        // Session valid, ambil/refresh profile
+        try {
+          const profile = await fetchProfile(session.user.id);
           if (profile) {
             setAuth(session.user, session);
-            setProfile(profile as any);
+            setProfile(profile);
           } else {
-            console.warn('Profile tidak ditemukan untuk session berjalan. Membersihkan session...');
-            throw new Error('Profile not found');
+            // Profile tidak ditemukan — kemungkinan trigger DB belum jalan
+            console.warn('[Auth] Profile tidak ditemukan untuk user:', session.user.id);
+            setAuth(session.user, session);
+            // Jangan logout, biarkan user tetap di app
           }
-        } else {
-          useAuthStore.getState().logout();
+        } catch (profileErr) {
+          if (isTransientError(profileErr)) {
+            console.warn('[Auth] Network error saat fetch profile, pertahankan sesi saat ini...');
+            // Jika sudah punya data auth sebelumnya, jangan hapus
+            const current = useAuthStore.getState();
+            if (!current.user) {
+              // Belum pernah login, set minimal auth dari session
+              setAuth(session.user, session);
+            }
+            setInitialized(true);
+            return;
+          }
+          throw profileErr;
         }
-      } catch (err: any) {
-        // Jika ada error apapun (misal token expired/invalid), bersihkan session
-        console.error('Auth initialization error:', err);
-        if (err.message && (err.message.includes('fetch') || err.message.includes('network'))) {
-           toast.error('Gagal terhubung ke database. Periksa koneksi internet Anda.');
-        }
+      } else {
+        // Tidak ada session (belum login atau sudah expired)
+        useAuthStore.getState().logout();
+      }
+    } catch (err: any) {
+      console.error('[Auth] Initialization error:', err);
+      // Hanya force logout jika bukan error sementara
+      if (!isTransientError(err)) {
         useAuthStore.getState().logout();
         await supabase.auth.signOut().catch(() => {});
-      } 
-      
-      // Dipanggil jika sukses atau gagal sepenuhnya (bukan sedang retry)
+      }
+    } finally {
       setInitialized(true);
-    };
+      if (!silent) setLoading(false);
+      isRecoveringRef.current = false;
+    }
+  }, [setAuth, setProfile, setInitialized, setLoading]);
 
-    initAuth();
+  useEffect(() => {
+    // 1. Inisialisasi awal
+    loadSession();
 
     // 2. Listen perubahan auth state
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Skip INITIAL_SESSION — sudah ditangani oleh initAuth di atas
+        // Skip INITIAL_SESSION — sudah ditangani oleh loadSession di atas
         if (event === 'INITIAL_SESSION') return;
 
         try {
           if (event === 'SIGNED_IN' && session?.user) {
             setAuth(session.user, session);
 
-            // maybeSingle() tidak throw error jika profil belum ada
-            const { data: profile, error: profileErr } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .maybeSingle();
-
-            if (profileErr) {
-              console.error('Profile fetch error on SIGNED_IN:', profileErr.message);
-              useAuthStore.getState().logout();
-              await supabase.auth.signOut().catch(() => {});
-            } else if (profile) {
-              setProfile(profile as any);
-            } else {
-              // Profil belum ada (trigger DB belum berjalan).
-              // Tetap set initialized agar app tidak stuck "Memuat"
-              console.warn('Profile tidak ditemukan untuk user:', session.user.id,
-                '— Pastikan trigger on_auth_user_created sudah aktif di Supabase.');
+            try {
+              const profile = await fetchProfile(session.user.id);
+              if (profile) {
+                setProfile(profile);
+              } else {
+                console.warn('[Auth] Profile belum ada untuk user:', session.user.id,
+                  '— Pastikan trigger on_auth_user_created sudah aktif di Supabase.');
+              }
+            } catch (profileErr) {
+              if (!isTransientError(profileErr)) {
+                console.error('[Auth] Profile fetch error on SIGNED_IN:', profileErr);
+                useAuthStore.getState().logout();
+                await supabase.auth.signOut().catch(() => {});
+              }
             }
 
-            // Pastikan loading selalu berhenti setelah SIGNED_IN selesai diproses
             setInitialized(true);
           }
 
           if (event === 'SIGNED_OUT') {
             useAuthStore.getState().logout();
             
-            // Gunakan optional chaining/dynamic import untuk store lain jika diperlukan, 
-            // atau panggil fungsi pembersihan spesifik.
-            
-            // Hard redirect ke login untuk mereset seluruh state React (mencegah abu-abu)
+            // Hard redirect ke login untuk mereset seluruh state React
             // Hanya jika pengguna tidak sedang di halaman publik
             const path = window.location.pathname;
             if (path !== '/login' && path !== '/' && path !== '/register' && !path.startsWith('/katalog') && !path.startsWith('/umkm/')) {
@@ -161,38 +211,44 @@ export default function App() {
             setAuth(session.user, session);
           }
         } catch (err) {
-          console.error('Auth state change error:', err);
+          console.error('[Auth] Auth state change error:', err);
           // Pastikan loading berhenti meski ada error
           setInitialized(true);
         }
       },
     );
 
-    // 3. Heartbeat (keep session alive & validate connection)
-    const heartbeatInterval = setInterval(async () => {
-      if (!useAuthStore.getState().isAuthenticated()) return;
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.warn('Heartbeat session error:', error.message);
-          const isNetworkError = error.message.toLowerCase().includes('fetch') || error.message.toLowerCase().includes('network');
-          if (!isNetworkError) {
-             // Jika bukan error network (misal token expired), sign out
-             useAuthStore.getState().logout();
-          }
-        } else if (!session) {
-          useAuthStore.getState().logout();
-        }
-      } catch (e) {
-        console.error('Heartbeat failed', e);
+    // 3. Visibility change — re-validasi sesi saat user kembali ke tab
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Saat tab kembali aktif, validasi sesi secara silent
+        loadSession({ silent: true });
       }
-    }, 5 * 60 * 1000); // 5 menit
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // 4. Online event — re-validasi sesi saat koneksi internet kembali
+    const handleOnline = () => {
+      console.log('[Auth] Koneksi internet kembali. Menyambung ulang...');
+      toast.info('Koneksi kembali. Menyinkronkan data...');
+      loadSession({ silent: true });
+    };
+    window.addEventListener('online', handleOnline);
+
+    // 5. Heartbeat (keep session alive & validate connection) — setiap 4 menit
+    const heartbeatInterval = setInterval(() => {
+      if (!useAuthStore.getState().isAuthenticated()) return;
+      // Heartbeat hanya silent-check, tidak force logout
+      loadSession({ silent: true });
+    }, 4 * 60 * 1000);
 
     return () => {
       subscription.unsubscribe();
       clearInterval(heartbeatInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('online', handleOnline);
     };
-  }, [setAuth, setProfile, setInitialized, setLoading]);
+  }, [loadSession]);
 
   return (
     <ErrorBoundary>
