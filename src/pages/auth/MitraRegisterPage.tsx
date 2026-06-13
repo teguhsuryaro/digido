@@ -260,11 +260,11 @@ export default function MitraRegisterPage() {
         </header>
 
         {/* Progress Bar */}
-        <div className="flex gap-2 mb-8">
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
           {STEPS.map((label, i) => (
-            <div key={label} className="flex-1">
+            <div key={label} className="flex-1 min-w-[75px]">
               <div className={`h-1.5 rounded-full transition-all duration-500 ${i <= step ? 'bg-primary-500' : 'bg-surface-secondary'}`} />
-              <p className={`text-[10px] uppercase font-black tracking-widest mt-2 ${i <= step ? 'text-primary-500' : 'text-content-placeholder'}`}>
+              <p className={`text-[9px] sm:text-[10px] uppercase font-black tracking-tighter sm:tracking-widest mt-2 whitespace-nowrap text-center sm:text-left ${i <= step ? 'text-primary-500' : 'text-content-placeholder'}`}>
                 {label}
               </p>
             </div>
@@ -274,97 +274,108 @@ export default function MitraRegisterPage() {
         <Card className="p-6 md:p-8 border-border shadow-soft">
           {/* STEP 0: Data UMKM */}
           {step === 0 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <Input 
-                label="Nama Toko" 
-                placeholder="Contoh: Warung Berkah" 
-                value={data.name}
-                onChange={(e) => setData({ ...data, name: e.target.value })}
-              />
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-content-secondary uppercase tracking-widest px-1">Jenis Usaha</label>
-                <select 
-                  className="w-full p-4 rounded-card bg-surface-secondary border border-border text-sm outline-none focus:ring-2 focus:ring-primary-500/20"
-                  value={data.businessType}
-                  onChange={(e) => setData({ ...data, businessType: e.target.value })}
-                  aria-label="Pilih jenis usaha"
-                >
-                  <option value="">Pilih Jenis Usaha</option>
-                  <option value="Kuliner">Kuliner</option>
-                  <option value="Sembako">Sembako</option>
-                  <option value="Kerajinan">Kerajinan</option>
-                  <option value="Jasa">Jasa</option>
-                </select>
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-content-secondary uppercase tracking-widest px-1">Deskripsi Singkat</label>
-                <textarea 
-                  className="w-full p-4 rounded-card bg-surface-secondary border border-border text-sm outline-none focus:ring-2 focus:ring-primary-500/20 min-h-[100px]"
-                  placeholder="Jelaskan apa yang Anda jual..."
-                  value={data.description}
-                  onChange={(e) => setData({ ...data, description: e.target.value })}
-                  aria-label="Deskripsi toko"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* Left Column */}
+              <div className="space-y-6">
+                <Input 
+                  label="Nama Toko" 
+                  placeholder="Contoh: Warung Berkah" 
+                  value={data.name}
+                  onChange={(e) => setData({ ...data, name: e.target.value })}
                 />
-              </div>
-              <LocationPicker 
-                value={data.latitude ? { lat: data.latitude, lng: data.longitude! } : null}
-                onChange={(lat, lng) => setData({ ...data, latitude: lat, longitude: lng })}
-              />
-
-              {/* Foto Profil Toko */}
-              <div className="space-y-2">
-                <p className="text-xs font-bold uppercase tracking-widest text-content-secondary px-1">
-                  Foto Profil Toko <span className="text-red-500">*</span>
-                </p>
-                <p className="text-[10px] text-content-placeholder px-1">
-                  Upload foto logo atau foto gerai UMKM Anda. Foto ini akan muncul di card katalog.
-                </p>
-                <div
-                  onClick={() => shopPhotoInputRef.current?.click()}
-                  className={`h-40 rounded-card border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-colors overflow-hidden relative ${
-                    data.shopPhotoFile
-                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20'
-                      : 'border-border bg-surface-secondary hover:border-primary-500'
-                  }`}
-                >
-                  {data.shopPhotoFile ? (
-                    <>
-                      <img
-                        src={URL.createObjectURL(data.shopPhotoFile)}
-                        alt="Preview foto toko"
-                        className="absolute inset-0 w-full h-full object-cover opacity-30"
-                      />
-                      <p className="text-xs font-bold text-primary-500 flex items-center gap-1 z-10">
-                        <CheckCircle size={14} /> Foto Toko Terpilih
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <Store size={28} className="text-content-placeholder mb-1" />
-                      <span className="text-[10px] font-bold text-content-placeholder">KLIK UNTUK UPLOAD FOTO TOKO</span>
-                    </>
-                  )}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-content-secondary uppercase tracking-widest px-1">Jenis Usaha</label>
+                  <select 
+                    className="w-full p-4 rounded-card bg-surface-secondary border border-border text-sm outline-none focus:ring-2 focus:ring-primary-500/20"
+                    value={data.businessType}
+                    onChange={(e) => setData({ ...data, businessType: e.target.value })}
+                    aria-label="Pilih jenis usaha"
+                  >
+                    <option value="">Pilih Jenis Usaha</option>
+                    <option value="Kuliner">Kuliner</option>
+                    <option value="Sembako">Sembako</option>
+                    <option value="Kerajinan">Kerajinan</option>
+                    <option value="Jasa">Jasa</option>
+                  </select>
                 </div>
-                <input
-                  type="file"
-                  ref={shopPhotoInputRef}
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => setData({ ...data, shopPhotoFile: e.target.files?.[0] || null })}
-                />
+                <div>
+                  <Input
+                    label="Nomor WhatsApp Toko"
+                    placeholder="Contoh: 081234567890"
+                    value={data.whatsappNumber}
+                    onChange={(e) => setData({ ...data, whatsappNumber: e.target.value })}
+                    required
+                  />
+                  <p className="text-[10px] text-content-placeholder px-1 mt-1.5">
+                    Nomor ini akan digunakan oleh pelanggan untuk menghubungi toko Anda via WhatsApp.
+                  </p>
+                </div>
               </div>
 
-              {/* Nomor WhatsApp */}
-              <Input
-                label="Nomor WhatsApp Toko"
-                placeholder="Contoh: 081234567890"
-                value={data.whatsappNumber}
-                onChange={(e) => setData({ ...data, whatsappNumber: e.target.value })}
-                required
-              />
-              <p className="text-[10px] text-content-placeholder px-1 -mt-4">
-                Nomor ini akan digunakan oleh pelanggan untuk menghubungi toko Anda via WhatsApp.
-              </p>
+              {/* Right Column */}
+              <div className="space-y-6">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-content-secondary uppercase tracking-widest px-1">Deskripsi Singkat</label>
+                  <textarea 
+                    className="w-full p-4 rounded-card bg-surface-secondary border border-border text-sm outline-none focus:ring-2 focus:ring-primary-500/20 min-h-[120px] resize-none"
+                    placeholder="Jelaskan apa yang Anda jual..."
+                    value={data.description}
+                    onChange={(e) => setData({ ...data, description: e.target.value })}
+                    aria-label="Deskripsi toko"
+                  />
+                </div>
+                
+                {/* Foto Profil Toko */}
+                <div className="space-y-1.5">
+                  <p className="text-xs font-bold uppercase tracking-widest text-content-secondary px-1">
+                    Foto Profil Toko <span className="text-red-500">*</span>
+                  </p>
+                  <div
+                    onClick={() => shopPhotoInputRef.current?.click()}
+                    className={`h-32 rounded-card border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-colors overflow-hidden relative ${
+                      data.shopPhotoFile
+                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20'
+                        : 'border-border bg-surface-secondary hover:border-primary-500'
+                    }`}
+                  >
+                    {data.shopPhotoFile ? (
+                      <>
+                        <img
+                          src={URL.createObjectURL(data.shopPhotoFile)}
+                          alt="Preview foto toko"
+                          className="absolute inset-0 w-full h-full object-cover opacity-30"
+                        />
+                        <p className="text-xs font-bold text-primary-500 flex items-center gap-1 z-10">
+                          <CheckCircle size={14} /> Foto Terpilih
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <Store size={24} className="text-content-placeholder mb-1" />
+                        <span className="text-[10px] font-bold text-content-placeholder text-center px-4">KLIK UNTUK UPLOAD FOTO TOKO</span>
+                      </>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    ref={shopPhotoInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={(e) => setData({ ...data, shopPhotoFile: e.target.files?.[0] || null })}
+                  />
+                  <p className="text-[10px] text-content-placeholder px-1 mt-1">
+                    Upload foto logo atau gerai UMKM. Foto ini akan muncul di card katalog.
+                  </p>
+                </div>
+              </div>
+
+              {/* Full Width */}
+              <div className="md:col-span-2 pt-2">
+                <LocationPicker 
+                  value={data.latitude ? { lat: data.latitude, lng: data.longitude! } : null}
+                  onChange={(lat, lng) => setData({ ...data, latitude: lat, longitude: lng })}
+                />
+              </div>
             </div>
           )}
 
@@ -449,28 +460,30 @@ export default function MitraRegisterPage() {
               </div>
               <div className="space-y-6 divide-y divide-border">
                 {data.faqs.map((faq, idx) => (
-                  <div key={idx} className="pt-6 first:pt-0 space-y-3">
+                  <div key={idx} className="pt-6 first:pt-0 space-y-4">
                     <p className="text-[10px] font-black text-primary-500 uppercase tracking-tighter">Pertanyaan #{idx + 1}</p>
-                    <Input 
-                      placeholder="Pertanyaan" 
-                      value={faq.question}
-                      onChange={(e) => {
-                        const newFaqs = [...data.faqs];
-                        newFaqs[idx].question = e.target.value;
-                        setData({ ...data, faqs: newFaqs });
-                      }}
-                    />
-                    <textarea 
-                      className="w-full p-4 rounded-card bg-surface-secondary border border-border text-sm outline-none focus:ring-2 focus:ring-primary-500/20 min-h-[80px]"
-                      placeholder="Jawaban"
-                      value={faq.answer}
-                      onChange={(e) => {
-                        const newFaqs = [...data.faqs];
-                        newFaqs[idx].answer = e.target.value;
-                        setData({ ...data, faqs: newFaqs });
-                      }}
-                      aria-label={`Jawaban FAQ ${idx + 1}`}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Input 
+                        placeholder="Pertanyaan" 
+                        value={faq.question}
+                        onChange={(e) => {
+                          const newFaqs = [...data.faqs];
+                          newFaqs[idx].question = e.target.value;
+                          setData({ ...data, faqs: newFaqs });
+                        }}
+                      />
+                      <textarea 
+                        className="w-full p-4 rounded-card bg-surface-secondary border border-border text-sm outline-none focus:ring-2 focus:ring-primary-500/20 min-h-[50px] resize-none"
+                        placeholder="Jawaban"
+                        value={faq.answer}
+                        onChange={(e) => {
+                          const newFaqs = [...data.faqs];
+                          newFaqs[idx].answer = e.target.value;
+                          setData({ ...data, faqs: newFaqs });
+                        }}
+                        aria-label={`Jawaban FAQ ${idx + 1}`}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
