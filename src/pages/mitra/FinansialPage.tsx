@@ -409,10 +409,10 @@ export default function FinansialPage() {
                         <td className="px-4 py-3 text-center">
                           <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${
                             w.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400' :
-                            w.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400' :
+                            w.status === 'pending' ? 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400' :
                             'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400'
                           }`}>
-                            {w.status === 'completed' ? 'Selesai' : w.status === 'pending' ? 'Diproses' : 'Gagal'}
+                            {w.status === 'completed' ? 'Selesai' : w.status === 'pending' ? 'Selesai' : 'Gagal'}
                           </span>
                         </td>
                       </tr>

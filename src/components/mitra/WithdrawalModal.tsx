@@ -56,18 +56,18 @@ export default function WithdrawalModal({ isOpen, onClose, umkmId, maxBalance, o
         .insert({
           umkm_id: umkmId,
           amount: numAmount,
-          status: 'pending',
+          status: 'completed',
         });
 
       if (error) throw error;
 
-      toast.success('Permintaan penarikan dana berhasil diajukan.');
+      toast.success('Dana berhasil dicairkan.');
       onSuccess();
       onClose();
       setAmount('');
     } catch (err: any) {
       console.error('Withdrawal error:', err);
-      toast.error(err.message || 'Gagal mengajukan penarikan dana.');
+      toast.error(err.message || 'Gagal mencairkan dana.');
     } finally {
       setIsSubmitting(false);
     }
@@ -166,7 +166,7 @@ export default function WithdrawalModal({ isOpen, onClose, umkmId, maxBalance, o
               fullWidth
               isLoading={isSubmitting}
             >
-              Ajukan
+              Cairkan
             </Button>
           </div>
         </form>
