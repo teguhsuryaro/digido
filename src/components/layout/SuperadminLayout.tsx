@@ -8,10 +8,10 @@ import ThemeToggle from '@/components/ui/ThemeToggle';
 import { useState } from 'react';
 
 const sidenavItems = [
-  { to: '/superadmin', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/superadmin/pengguna', icon: Users, label: 'Pengguna' },
-  { to: '/superadmin/mitra', icon: Users, label: 'Validasi Mitra' },
-  { to: '/superadmin/laporan', icon: AlertTriangle, label: 'Laporan Masuk' },
+  { to: '/superadmin', icon: LayoutDashboard, label: 'Dashboard', shortLabel: 'Dasbor' },
+  { to: '/superadmin/pengguna', icon: Users, label: 'Pengguna', shortLabel: 'Pengguna' },
+  { to: '/superadmin/mitra', icon: Users, label: 'Validasi Mitra', shortLabel: 'Mitra' },
+  { to: '/superadmin/laporan', icon: AlertTriangle, label: 'Laporan Masuk', shortLabel: 'Laporan' },
 ];
 
 export default function SuperadminLayout() {
@@ -30,13 +30,16 @@ export default function SuperadminLayout() {
         
         {/* Sidebar Header */}
         <div className="mb-6">
-          <div className="flex items-center gap-2 mb-1">
-            <ShieldAlert size={20} className="text-red-500" />
-            <h2 className="text-lg font-bold text-red-500">Superadmin</h2>
+          <div className="flex items-center gap-3 mb-3 bg-red-50 dark:bg-red-950/30 p-3 rounded-card border border-red-100 dark:border-red-900/50">
+            <ShieldAlert size={24} className="text-red-600 dark:text-red-400 shrink-0" />
+            <div>
+              <h2 className="text-sm font-black text-red-600 dark:text-red-400 uppercase tracking-widest leading-none">Superadmin</h2>
+              <p className="text-[10px] text-red-500/80 font-medium mt-1">Mode Manajemen</p>
+            </div>
           </div>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-xs text-content-secondary pl-7">
-              {profile?.full_name || 'Admin'}
+          <div className="flex items-center justify-between px-1">
+            <p className="text-xs text-content-secondary font-medium truncate max-w-[140px]">
+              {profile?.full_name || 'Administrator'}
             </p>
             <ThemeToggle />
           </div>
@@ -79,11 +82,19 @@ export default function SuperadminLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 w-full max-w-5xl mx-auto px-4 py-6 md:px-8">
-        <div className="md:hidden flex justify-end mb-4">
+      <main className="flex-1 flex flex-col min-w-0 w-full">
+        {/* Mobile Header (Sticky) */}
+        <header className="md:hidden sticky top-0 z-30 bg-surface-card border-b border-border px-4 py-3 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 px-3 py-1.5 rounded-full">
+            <ShieldAlert size={16} className="text-red-600 dark:text-red-400" />
+            <span className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Superadmin Mode</span>
+          </div>
           <ThemeToggle />
+        </header>
+
+        <div className="w-full max-w-5xl mx-auto px-4 py-6 md:px-8">
+          <Outlet />
         </div>
-        <Outlet />
       </main>
 
       {/* Mobile Bottom Nav */}
@@ -105,7 +116,7 @@ export default function SuperadminLayout() {
                 {({ isActive }) => (
                   <>
                     <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
-                    <span className="text-[10px] font-bold">{item.label}</span>
+                    <span className="text-[10px] font-bold text-center leading-tight truncate w-full px-1">{item.shortLabel}</span>
                   </>
                 )}
               </NavLink>
