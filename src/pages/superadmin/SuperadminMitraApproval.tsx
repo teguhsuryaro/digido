@@ -38,7 +38,7 @@ export default function SuperadminMitraApproval() {
         const ownerIds = umkms.map(u => u.owner_id);
         const { data: profilesData } = await supabase
           .from('profiles')
-          .select('id, full_name, email')
+          .select('id, full_name')
           .in('id', ownerIds);
           
         umkms.forEach(u => {
