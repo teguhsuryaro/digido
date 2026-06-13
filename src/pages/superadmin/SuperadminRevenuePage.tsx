@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Banknote, ArrowLeft, Filter, TrendingUp, Calendar, ArrowDownLeft, CheckCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Banknote, Filter, TrendingUp, Calendar, ArrowDownLeft, CheckCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { formatRupiah, formatDate } from '@/utils/format';
 import { toast } from '@/components/ui/Toast';
@@ -16,7 +15,6 @@ interface RevenueItem {
 }
 
 export default function SuperadminRevenuePage() {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [revenueItems, setRevenueItems] = useState<RevenueItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'transaksi' | 'penarikan' | 'paket'>('all');
@@ -145,12 +143,6 @@ export default function SuperadminRevenuePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
-        <button 
-          onClick={() => navigate('/superadmin')}
-          className="p-2 hover:bg-surface-secondary rounded-full transition-colors text-content-secondary"
-        >
-          <ArrowLeft size={24} />
-        </button>
         <Banknote className="text-yellow-500" size={28} />
         <h1 className="text-2xl font-bold text-content-primary">Detail Pendapatan</h1>
       </div>
