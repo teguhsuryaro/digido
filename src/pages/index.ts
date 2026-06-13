@@ -35,3 +35,4 @@ export const SuperadminDashboard = lazy(() => import('@/pages/superadmin/Superad
 export const SuperadminMitraApproval = lazy(() => import('@/pages/superadmin/SuperadminMitraApproval'));
 export const SuperadminReports = lazy(() => import('@/pages/superadmin/SuperadminReports'));
 export const SuperadminUsers = lazy(() => import('@/pages/superadmin/SuperadminUsers'));
+export const SuperadminRevenuePage = lazy(() => import('@/pages/superadmin/SuperadminRevenuePage'));

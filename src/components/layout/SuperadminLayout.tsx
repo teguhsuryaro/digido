@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, AlertTriangle, LogOut, ShieldAlert } from 'lucide-react';
+import { LayoutDashboard, Users, AlertTriangle, LogOut, ShieldAlert, Banknote } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { handleLogout } from '@/utils/logout';
 import Button from '@/components/ui/Button';
@@ -12,6 +12,7 @@ const sidenavItems = [
   { to: '/superadmin/pengguna', icon: Users, label: 'Pengguna', shortLabel: 'Pengguna' },
   { to: '/superadmin/mitra', icon: Users, label: 'Validasi Mitra', shortLabel: 'Mitra' },
   { to: '/superadmin/laporan', icon: AlertTriangle, label: 'Laporan Masuk', shortLabel: 'Laporan' },
+  { to: '/superadmin/pendapatan', icon: Banknote, label: 'Pendapatan', shortLabel: 'Pendapatan' },
 ];
 
 export default function SuperadminLayout() {

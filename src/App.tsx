@@ -25,7 +25,7 @@ import {
   MitraDashboardPage, InventarisPage, OrderManagementPage, DeliverySettingsPage,
   OperasionalPage, FinansialPage, LiveChatPage, MitraProfilePage, MitraSettingsPage,
   SubscriptionPage, UMKMReviewsPage,
-  SuperadminDashboard, SuperadminMitraApproval, SuperadminReports, SuperadminUsers,
+  SuperadminDashboard, SuperadminMitraApproval, SuperadminReports, SuperadminUsers, SuperadminRevenuePage,
 } from '@/pages';
 
 import { useGlobalErrorHandler } from '@/hooks/useGlobalErrorHandler';
@@ -252,6 +252,7 @@ export default function App() {
                 <Route path="mitra" element={<SuperadminMitraApproval />} />
                 <Route path="laporan" element={<SuperadminReports />} />
                 <Route path="pengguna" element={<SuperadminUsers />} />
+                <Route path="pendapatan" element={<SuperadminRevenuePage />} />
               </Route>
             </Route>
           </Route>

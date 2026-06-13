@@ -4,8 +4,10 @@ import { supabase } from '@/lib/supabase';
 import { formatRupiah } from '@/utils/format';
 import Skeleton from '@/components/ui/Skeleton';
 import Card from '@/components/ui/Card';
+import { useNavigate } from 'react-router-dom';
 
 export default function SuperadminDashboard() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalMitra: 0,
@@ -112,7 +114,10 @@ export default function SuperadminDashboard() {
             </div>
             <p className="text-3xl font-extrabold text-content-primary">{stats.completedOrders}</p>
           </Card>
-          <Card className="p-6 flex flex-col gap-2 border-l-4 border-l-yellow-500">
+          <Card 
+            className="p-6 flex flex-col gap-2 border-l-4 border-l-yellow-500 cursor-pointer hover:bg-surface-secondary transition-colors"
+            onClick={() => navigate('/superadmin/pendapatan')}
+          >
             <div className="flex justify-between items-start">
               <p className="text-sm font-medium text-content-secondary">Pendapatan Platform</p>
               <Banknote size={20} className="text-yellow-500" />
