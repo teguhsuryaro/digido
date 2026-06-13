@@ -23,9 +23,10 @@ export default function SuperadminMitraApproval() {
         `)
         .eq('approval_status', 'pending');
         
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') throw error;
       setPendingUmkm(data || []);
     } catch (err) {
+      console.error('Fetch pending umkm error:', err);
       toast.error('Gagal mengambil data pengajuan mitra');
     } finally {
       setIsLoading(false);
@@ -76,8 +77,14 @@ export default function SuperadminMitraApproval() {
         {isLoading ? (
           <div className="p-8 text-center text-content-secondary">Memuat data...</div>
         ) : pendingUmkm.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-content-secondary">Belum ada data pengajuan mitra yang perlu divalidasi saat ini.</p>
+          <div className="py-20 flex flex-col items-center justify-center text-center">
+            <div className="w-20 h-20 bg-surface-secondary rounded-full flex items-center justify-center mb-4">
+              <Users size={32} className="text-content-placeholder" />
+            </div>
+            <h3 className="text-lg font-bold text-content-primary mb-1">Semua Telah Divalidasi</h3>
+            <p className="text-content-secondary max-w-sm">
+              Belum ada data pengajuan mitra baru yang perlu divalidasi saat ini. Kerja bagus!
+            </p>
           </div>
         ) : (
           <div className="divide-y divide-border">
