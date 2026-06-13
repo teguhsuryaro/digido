@@ -87,15 +87,19 @@ export default function SuperadminMitraApproval() {
     setIsSubmitting(true);
     try {
       // 1. Update UMKM status and is_active
-      await supabase.from('umkm').update({ approval_status: 'approved', is_active: true } as any).eq('id', selectedUmkm.id);
+      const { error: umkmError } = await supabase.from('umkm').update({ approval_status: 'approved', is_active: true } as any).eq('id', selectedUmkm.id);
+      if (umkmError) throw umkmError;
+
       // 2. Update Profile role
-      await supabase.from('profiles').update({ role: 'mitra' } as any).eq('id', selectedUmkm.owner_id);
+      const { error: profileError } = await supabase.from('profiles').update({ role: 'mitra' } as any).eq('id', selectedUmkm.owner_id);
+      if (profileError) throw profileError;
       
       toast.success('Mitra berhasil disetujui');
       handleBackToList();
       fetchPending();
     } catch (err) {
-      toast.error('Gagal menyetujui mitra');
+      console.error('Approve error:', err);
+      toast.error('Gagal menyetujui mitra. Pastikan Anda memiliki hak akses.');
     } finally {
       setIsSubmitting(false);
     }
@@ -109,16 +113,21 @@ export default function SuperadminMitraApproval() {
     setIsSubmitting(true);
     try {
       // Hapus data secara tuntas agar pendaftar bisa daftar ulang
-      await supabase.from('umkm_documents').delete().eq('umkm_id', selectedUmkm.id);
-      await supabase.from('umkm_faq').delete().eq('umkm_id', selectedUmkm.id);
-      await supabase.from('umkm').delete().eq('id', selectedUmkm.id);
+      const { error: docError } = await supabase.from('umkm_documents').delete().eq('umkm_id', selectedUmkm.id);
+      if (docError) throw docError;
+
+      const { error: faqError } = await supabase.from('umkm_faq').delete().eq('umkm_id', selectedUmkm.id);
+      if (faqError) throw faqError;
+
+      const { error: umkmError } = await supabase.from('umkm').delete().eq('id', selectedUmkm.id);
+      if (umkmError) throw umkmError;
       
       toast.success('Pengajuan ditolak dan data dihapus');
       handleBackToList();
       fetchPending();
     } catch (err) {
       console.error('Reject error:', err);
-      toast.error('Gagal menolak mitra');
+      toast.error('Gagal menolak mitra. Pastikan Anda memiliki hak akses.');
     } finally {
       setIsSubmitting(false);
     }
