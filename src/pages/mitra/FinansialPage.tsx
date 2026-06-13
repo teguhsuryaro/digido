@@ -414,6 +414,9 @@ export default function FinansialPage() {
                         <td className="px-4 py-3 text-right">
                           <p className="font-black text-primary-500">{formatRupiah(w.amount)}</p>
                           <p className="text-[10px] text-content-secondary sm:hidden">Admin: {formatRupiah(w.admin_fee || 0)}</p>
+                          <p className="text-[10px] text-content-secondary sm:hidden font-mono mt-0.5 capitalize">
+                            {w.provider || '-'}{w.destination ? ` - ${w.destination}` : ''}
+                          </p>
                         </td>
                         <td className="px-4 py-3 text-right hidden sm:table-cell text-content-secondary font-medium">
                           {formatRupiah(w.admin_fee || 0)}
