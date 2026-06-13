@@ -80,7 +80,7 @@ export default function FinansialPage() {
   // Global All-Time Stats
   const globalStats = useMemo(() => {
     const totalRevenue = orders.reduce((sum, o) => sum + (o.total - (o.admin_fee || 500)), 0);
-    const totalWithdrawn = withdrawals.filter(w => w.status !== 'failed').reduce((sum, w) => sum + w.amount, 0);
+    const totalWithdrawn = withdrawals.filter(w => w.status !== 'failed').reduce((sum, w) => sum + w.amount + (w.admin_fee || 0), 0);
     const balance = totalRevenue - totalWithdrawn;
     
     return { totalRevenue, totalWithdrawn, balance };
@@ -395,8 +395,10 @@ export default function FinansialPage() {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="bg-surface-secondary text-content-placeholder font-bold uppercase text-[10px] tracking-widest border-b border-border">
-                    <th className="px-4 py-3">Tanggal</th>
+                    <th className="px-4 py-3">Waktu</th>
+                    <th className="px-4 py-3 hidden sm:table-cell">Tujuan</th>
                     <th className="px-4 py-3 text-right">Nominal</th>
+                    <th className="px-4 py-3 text-right hidden sm:table-cell">Admin</th>
                     <th className="px-4 py-3 text-center">Status</th>
                   </tr>
                 </thead>
@@ -404,8 +406,18 @@ export default function FinansialPage() {
                   {withdrawals.length > 0 ? (
                     withdrawals.map((w) => (
                       <tr key={w.id} className="hover:bg-surface-secondary transition-colors">
-                        <td className="px-4 py-3 text-content-secondary">{formatDate(w.created_at).split(',')[0]}</td>
-                        <td className="px-4 py-3 text-right font-black text-primary-500">{formatRupiah(w.amount)}</td>
+                        <td className="px-4 py-3 text-content-secondary whitespace-nowrap">{formatDate(w.created_at).split(',')[0]}</td>
+                        <td className="px-4 py-3 hidden sm:table-cell">
+                          <p className="font-bold text-content-primary capitalize">{w.provider || '-'}</p>
+                          {w.destination && <p className="text-[10px] text-content-secondary font-mono">{w.destination}</p>}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <p className="font-black text-primary-500">{formatRupiah(w.amount)}</p>
+                          <p className="text-[10px] text-content-secondary sm:hidden">Admin: {formatRupiah(w.admin_fee || 0)}</p>
+                        </td>
+                        <td className="px-4 py-3 text-right hidden sm:table-cell text-content-secondary font-medium">
+                          {formatRupiah(w.admin_fee || 0)}
+                        </td>
                         <td className="px-4 py-3 text-center">
                           <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${
                             w.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400' :
@@ -419,7 +431,7 @@ export default function FinansialPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={3} className="px-4 py-8 text-center text-content-placeholder italic">
+                      <td colSpan={5} className="px-4 py-8 text-center text-content-placeholder italic">
                         Belum ada riwayat penarikan.
                       </td>
                     </tr>

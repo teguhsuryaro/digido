@@ -52,26 +52,20 @@ export default function SuperadminRevenuePage() {
       }
 
       // 2. Ambil data Admin Fee dari Penarikan Dana
-      // Karena belum ada kolom admin_fee di withdrawals, kita kalkulasi berdasarkan withdrawal_method
       const { data: withdrawalsData, error: wdError } = await supabase
         .from('withdrawals')
-        .select('id, created_at, amount, status, umkm(withdrawal_method)')
-        .eq('status', 'completed'); // Anggap hanya yang completed yang sudah dipotong
+        .select('id, created_at, amount, status, admin_fee, method')
+        .eq('status', 'completed');
 
       if (!wdError && withdrawalsData) {
         (withdrawalsData as any[]).forEach(w => {
-          const method = w.umkm?.withdrawal_method || '';
-          let fee = 0;
-          if (method === 'ewallet') fee = 2500;
-          if (method === 'bank') fee = 4000;
-          
-          if (fee > 0) {
+          if (w.admin_fee && w.admin_fee > 0) {
             items.push({
               id: `wd-${w.id}`,
               date: w.created_at,
               source: 'penarikan',
-              description: `Admin Fee Penarikan (${method.toUpperCase()})`,
-              amount: fee,
+              description: `Admin Fee Penarikan (${(w.method || '').toUpperCase()})`,
+              amount: w.admin_fee,
             });
           }
         });

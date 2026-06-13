@@ -21,7 +21,9 @@ export default function WithdrawalModal({ isOpen, onClose, umkmId, maxBalance, o
   if (!isOpen) return null;
 
   const handleWithdrawAll = () => {
-    setAmount(maxBalance.toString());
+    const adminFee = umkm?.withdrawal_method === 'ewallet' ? 2500 : umkm?.withdrawal_method === 'bank' ? 4000 : 0;
+    const maxWithdraw = Math.max(0, maxBalance - adminFee);
+    setAmount(maxWithdraw.toString());
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,6 +51,14 @@ export default function WithdrawalModal({ isOpen, onClose, umkmId, maxBalance, o
       return;
     }
 
+    const adminFee = umkm.withdrawal_method === 'ewallet' ? 2500 : umkm.withdrawal_method === 'bank' ? 4000 : 0;
+    const totalDeduction = numAmount + adminFee;
+
+    if (totalDeduction > maxBalance) {
+      toast.error(`Saldo tidak cukup. Dibutuhkan Rp ${formatRupiah(totalDeduction).replace('Rp ', '')} (termasuk admin Rp ${adminFee})`);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { error } = await supabase
@@ -57,6 +67,10 @@ export default function WithdrawalModal({ isOpen, onClose, umkmId, maxBalance, o
           umkm_id: umkmId,
           amount: numAmount,
           status: 'completed',
+          admin_fee: adminFee,
+          method: umkm.withdrawal_method,
+          provider: umkm.withdrawal_provider,
+          destination: umkm.withdrawal_account,
         });
 
       if (error) throw error;
@@ -110,7 +124,14 @@ export default function WithdrawalModal({ isOpen, onClose, umkmId, maxBalance, o
               />
             </div>
             <div className="flex justify-between items-center mt-2">
-              <p className="text-[11px] text-content-secondary">Min. Rp 10.000</p>
+              <p className="text-[11px] text-content-secondary">
+                Min. Rp 10.000
+                {amount && !isNaN(parseInt(amount)) && (
+                  <span className="ml-2 text-primary-500 font-medium">
+                    (Total: {formatRupiah(parseInt(amount) + (umkm?.withdrawal_method === 'ewallet' ? 2500 : umkm?.withdrawal_method === 'bank' ? 4000 : 0))})
+                  </span>
+                )}
+              </p>
               <button
                 type="button"
                 onClick={handleWithdrawAll}
