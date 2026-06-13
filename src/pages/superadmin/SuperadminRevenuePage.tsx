@@ -34,21 +34,24 @@ export default function SuperadminRevenuePage() {
       // 1. Ambil data Admin Fee dari Transaksi
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
-        .select('id, created_at, admin_fee, order_id')
+        .select('id, created_at, admin_fee')
         .eq('status', 'completed');
       
       if (!ordersError && ordersData) {
         (ordersData as any[]).forEach(o => {
-          if (o.admin_fee && o.admin_fee > 0) {
-            items.push({
-              id: `ord-${o.id}`,
-              date: o.created_at,
-              source: 'transaksi',
-              description: `Admin Fee Transaksi #${o.order_id}`,
-              amount: o.admin_fee,
-            });
-          }
+          // Gunakan admin_fee dari database, jika null (transaksi lama) gunakan 500
+          const fee = (o.admin_fee && o.admin_fee > 0) ? o.admin_fee : 500;
+          
+          items.push({
+            id: `ord-${o.id}`,
+            date: o.created_at,
+            source: 'transaksi',
+            description: `Admin Fee Transaksi #${o.id.slice(0, 8)}`,
+            amount: fee,
+          });
         });
+      } else if (ordersError) {
+        console.error('Error fetching orders admin fee:', ordersError);
       }
 
       // 2. Ambil data Admin Fee dari Penarikan Dana
