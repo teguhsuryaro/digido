@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Store, BarChart3, ShoppingBag, LogOut, ChevronRight, Settings } from 'lucide-react';
+import { Camera, Store, BarChart3, ShoppingBag, LogOut, ChevronRight, Settings, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { handleLogout } from '@/utils/logout';
@@ -12,6 +12,7 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import ConfirmLogoutModal from '@/components/ui/ConfirmLogoutModal';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import ReportModal from '@/components/ReportModal';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function ProfilePage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isLoadingWallet, setIsLoadingWallet] = useState(true);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [umkmStatus, setUmkmStatus] = useState<'none' | 'pending' | 'rejected' | 'approved'>('none');
 
   useEffect(() => {
@@ -353,6 +355,23 @@ export default function ProfilePage() {
                 <ThemeToggle />
               </div>
 
+              {/* Laporkan Website */}
+              <button 
+                onClick={() => setIsReportModalOpen(true)}
+                className="w-full p-4 flex items-center justify-between hover:bg-surface-secondary transition-colors border-b border-border"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-950/30 flex items-center justify-center text-orange-600 shrink-0">
+                    <AlertTriangle size={20} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-bold text-content-primary">Laporkan Website</p>
+                    <p className="text-[10px] text-content-secondary">Beri masukan atau laporkan kendala</p>
+                  </div>
+                </div>
+                <span className="text-content-placeholder"><ChevronRight size={16} /></span>
+              </button>
+
               {/* Logout */}
               <button 
                 onClick={() => setIsLogoutModalOpen(true)}
@@ -387,6 +406,15 @@ export default function ProfilePage() {
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirm={onLogout}
       />
+
+      {isReportModalOpen && user && (
+        <ReportModal
+          targetType="website"
+          targetId={user.id}
+          targetName="DigiDO System"
+          onClose={() => setIsReportModalOpen(false)}
+        />
+      )}
     </PageTransition>
   );
 }

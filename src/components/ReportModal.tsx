@@ -6,7 +6,7 @@ import { toast } from '@/components/ui/Toast';
 import Button from '@/components/ui/Button';
 
 interface ReportModalProps {
-  targetType: 'product' | 'umkm' | 'user' | 'review';
+  targetType: 'product' | 'umkm' | 'user' | 'review' | 'website';
   targetId: string;
   targetName: string;
   onClose: () => void;
@@ -70,7 +70,7 @@ export default function ReportModal({ targetType, targetId, targetName, onClose 
           <div className="p-4 border-b border-border flex items-center justify-between bg-surface-secondary/50 rounded-t-card">
             <h2 className="font-bold text-content-primary flex items-center gap-2">
               <AlertTriangle size={18} className="text-red-500" />
-              Laporkan {targetType === 'umkm' ? 'Toko' : 'Produk'}
+              Laporkan {targetType === 'umkm' ? 'Toko' : targetType === 'website' ? 'Aplikasi/Website' : 'Produk'}
             </h2>
             <button
               onClick={onClose}
