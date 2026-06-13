@@ -237,7 +237,7 @@ export default function App() {
                 <Route path="pengaturan" element={<MitraSettingsPage />} />
                 <Route path="pengaturan/operasional" element={<OperasionalPage />} />
                 <Route path="pengaturan/profil" element={<MitraProfilePage />} />
-                <Route path="pengaturan/paket" element={<SubscriptionPage />} />
+                <Route path="pengaturan/langganan" element={<SubscriptionPage />} />
                 <Route path="pengaturan/pengiriman" element={<DeliverySettingsPage />} />
                 <Route path="pengaturan/finansial" element={<FinansialPage />} />
                 <Route path="pengaturan/katalog" element={<InventarisPage />} />

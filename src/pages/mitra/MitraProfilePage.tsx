@@ -227,7 +227,7 @@ export default function MitraProfilePage() {
             <Card
               className="p-5 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 shadow-sm"
               hoverable
-              onClick={() => navigate('/mitra/paket')}
+              onClick={() => navigate('/mitra/pengaturan/langganan')}
             >
               <div className="flex items-center justify-between">
                 <div>
