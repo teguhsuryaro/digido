@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Store, ClipboardList, Settings, LogOut, ShoppingBag, MessageCircle } from 'lucide-react';
+import { LayoutDashboard, Store, ClipboardList, Settings, LogOut, MessageCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useMitraChatStore } from '@/store/useMitraChatStore';
@@ -103,13 +103,7 @@ export default function MitraLayout() {
 
         {/* Sidebar Footer Extra Links */}
         <div className="border-t border-border pt-2 space-y-1 mt-auto">
-          <NavLink
-            to="/katalog"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-button text-sm font-medium text-content-secondary hover:bg-surface-secondary transition-colors"
-          >
-            <ShoppingBag size={18} className="shrink-0" />
-            <span>Belanja</span>
-          </NavLink>
+
           <Button variant="ghost" size="sm" onClick={() => setIsLogoutModalOpen(true)} className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20">
             <LogOut size={16} className="mr-2" /> Keluar
           </Button>
@@ -123,7 +117,7 @@ export default function MitraLayout() {
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-card border-t border-border z-40">
-        <div className="flex items-center h-16 pb-safe-bottom px-2 overflow-x-auto scrollbar-hide gap-1 sm:justify-around">
+        <div className="flex items-center justify-around h-16 pb-safe-bottom px-4 w-full">
           {sidenavItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -132,7 +126,7 @@ export default function MitraLayout() {
                 to={item.to}
                 end={item.to === '/mitra'}
                 className={({ isActive }) =>
-                  `flex flex-col items-center justify-center gap-1 w-14 shrink-0 transition-colors ${
+                  `flex flex-col items-center justify-center gap-1 w-16 shrink-0 transition-colors ${
                     isActive ? 'text-primary-500' : 'text-content-secondary'
                   }`
                 }
@@ -153,21 +147,7 @@ export default function MitraLayout() {
               </NavLink>
             );
           })}
-          <NavLink
-            to="/katalog"
-            className={({ isActive }) =>
-              `flex flex-col items-center justify-center gap-1 w-14 shrink-0 transition-colors ${
-                isActive ? 'text-primary-500' : 'text-content-secondary'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <ShoppingBag size={18} strokeWidth={isActive ? 2.5 : 1.5} />
-                <span className="text-[8px] font-bold">Belanja</span>
-              </>
-            )}
-          </NavLink>
+
         </div>
       </nav>
 
