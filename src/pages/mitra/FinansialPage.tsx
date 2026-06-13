@@ -16,8 +16,9 @@ import PageTransition from '@/components/ui/PageTransition';
 import Card from '@/components/ui/Card';
 import Skeleton from '@/components/ui/Skeleton';
 import Button from '@/components/ui/Button';
-import { Wallet, Calendar, ChevronLeft } from 'lucide-react';
+import { Wallet, Calendar, ChevronLeft, CreditCard, Building2, QrCode, ArrowRight } from 'lucide-react';
 import WithdrawalModal from '@/components/mitra/WithdrawalModal';
+import WithdrawalMethodModal from '@/components/mitra/WithdrawalMethodModal';
 import { useNavigate } from 'react-router-dom';
 
 type PeriodFilter = 'daily' | 'weekly' | 'monthly' | 'yearly';
@@ -31,6 +32,7 @@ export default function FinansialPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('weekly');
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+  const [isMethodModalOpen, setIsMethodModalOpen] = useState(false);
 
   const fetchData = async () => {
     if (!user) return;
@@ -38,7 +40,7 @@ export default function FinansialPage() {
       // 1. Get UMKM owned by user
       const { data: umkmData } = await supabase
         .from('umkm')
-        .select('id, name')
+        .select('id, name, withdrawal_method, withdrawal_provider, withdrawal_account')
         .eq('owner_id', user.id)
         .single();
       
@@ -231,10 +233,37 @@ export default function FinansialPage() {
             </div>
           </Card>
           
-          <Card className="p-6 bg-surface-card border-border flex flex-col justify-center">
-            <p className="text-[10px] uppercase font-bold text-content-placeholder mb-1">Total Dana Ditarik</p>
-            <h2 className="text-2xl font-black text-content-primary">{formatRupiah(globalStats.totalWithdrawn)}</h2>
-          </Card>
+          <div className="flex flex-col gap-4">
+            <Card className="p-6 bg-surface-card border-border flex flex-col justify-center relative overflow-hidden flex-1">
+              <p className="text-[10px] uppercase font-bold text-content-placeholder mb-1">Total Dana Ditarik</p>
+              <h2 className="text-2xl font-black text-content-primary">{formatRupiah(globalStats.totalWithdrawn)}</h2>
+            </Card>
+
+            <Card className="p-4 bg-surface-card border-border flex-1 flex flex-col justify-between">
+              <div>
+                <p className="text-[10px] uppercase font-bold text-content-placeholder mb-2">Metode Pencairan</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    {umkm.withdrawal_method === 'qris' ? <QrCode size={16} /> : umkm.withdrawal_method === 'bank' ? <Building2 size={16} /> : <CreditCard size={16} />}
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm text-content-primary capitalize">
+                      {umkm.withdrawal_provider || 'Belum Diatur'}
+                    </p>
+                    {umkm.withdrawal_method !== 'qris' && umkm.withdrawal_account && (
+                      <p className="text-xs text-content-secondary font-mono">{umkm.withdrawal_account}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsMethodModalOpen(true)}
+                className="mt-3 text-xs font-bold text-primary-500 hover:text-primary-600 flex items-center gap-1 w-fit"
+              >
+                Ubah Metode <ArrowRight size={12} />
+              </button>
+            </Card>
+          </div>
         </div>
 
         <hr className="border-border" />
@@ -407,6 +436,14 @@ export default function FinansialPage() {
         onClose={() => setIsWithdrawModalOpen(false)}
         umkmId={umkm.id}
         maxBalance={globalStats.balance}
+        onSuccess={fetchData}
+        umkm={umkm}
+      />
+
+      <WithdrawalMethodModal 
+        isOpen={isMethodModalOpen}
+        onClose={() => setIsMethodModalOpen(false)}
+        umkm={umkm}
         onSuccess={fetchData}
       />
     </PageTransition>

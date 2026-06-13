@@ -11,9 +11,10 @@ interface Props {
   umkmId: string;
   maxBalance: number;
   onSuccess: () => void;
+  umkm?: any;
 }
 
-export default function WithdrawalModal({ isOpen, onClose, umkmId, maxBalance, onSuccess }: Props) {
+export default function WithdrawalModal({ isOpen, onClose, umkmId, maxBalance, onSuccess, umkm }: Props) {
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -40,6 +41,11 @@ export default function WithdrawalModal({ isOpen, onClose, umkmId, maxBalance, o
 
     if (numAmount < 10000) {
       toast.error('Minimal penarikan adalah Rp 10.000');
+      return;
+    }
+
+    if (!umkm?.withdrawal_provider) {
+      toast.error('Atur metode pencairan dana terlebih dahulu.');
       return;
     }
 
@@ -113,6 +119,35 @@ export default function WithdrawalModal({ isOpen, onClose, umkmId, maxBalance, o
                 Tarik Semua
               </button>
             </div>
+          </div>
+
+          <div className="bg-surface-secondary p-4 rounded-xl space-y-2 border border-border">
+            <p className="text-xs font-bold text-content-primary">Tujuan Pencairan</p>
+            {umkm?.withdrawal_provider ? (
+              <div className="flex items-center gap-3 mt-1">
+                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                  <Wallet size={14} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-content-primary">{umkm.withdrawal_provider}</p>
+                  {umkm.withdrawal_method !== 'qris' && (
+                    <p className="text-xs text-content-secondary font-mono">{umkm.withdrawal_account}</p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-red-500 font-medium">Metode pencairan belum diatur. Silakan atur terlebih dahulu di halaman keuangan.</p>
+            )}
+            {umkm?.withdrawal_method && umkm.withdrawal_method !== 'qris' && (
+              <p className="text-[10px] text-content-secondary mt-2 italic">
+                * Biaya admin {umkm.withdrawal_method === 'ewallet' ? 'Rp 2.500' : 'Rp 4.000'} akan dipotong dari nominal pencairan.
+              </p>
+            )}
+            {umkm?.withdrawal_method === 'qris' && (
+              <p className="text-[10px] text-green-600 mt-2 italic">
+                * Pencairan QRIS tidak dikenakan biaya admin.
+              </p>
+            )}
           </div>
 
           <div className="flex gap-3 pt-2">
