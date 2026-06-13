@@ -132,10 +132,16 @@ export default function MitraRegisterPage() {
 
       if (existingUmkm) {
         console.log('Membersihkan sisa pendaftaran toko menggantung:', (existingUmkm as any).id);
-        await supabase
-          .from('umkm')
-          .delete()
-          .eq('id', (existingUmkm as any).id);
+        try {
+          await supabase.from('umkm_documents').delete().eq('umkm_id', (existingUmkm as any).id);
+          await supabase.from('umkm_faq').delete().eq('umkm_id', (existingUmkm as any).id);
+          await supabase
+            .from('umkm')
+            .delete()
+            .eq('id', (existingUmkm as any).id);
+        } catch (e) {
+          console.warn('Gagal membersihkan sisa pendaftaran:', e);
+        }
       }
 
       // 1. Insert UMKM
@@ -244,13 +250,7 @@ export default function MitraRegisterPage() {
           .eq('id', user.id);
       }
 
-      // 5.5. Selesaikan step registrasi tanpa mengaktifkan is_active
-      await supabase
-        .from('umkm')
-        .update({ 
-          registration_completed_at: new Date().toISOString()
-        } as any)
-        .eq('id', umkmId);
+      // (Dihapus: Selesaikan step registrasi tanpa mengaktifkan is_active karena kolom tidak ada di skema)
 
       // 6. Update local profile store (hanya phone, tidak ganti role)
       if (profile && !profile.phone) {
@@ -264,8 +264,14 @@ export default function MitraRegisterPage() {
       navigate('/profil');
     } catch (err: any) {
       if (umkmId) {
-        // CLEANUP: Hapus UMKM jika proses pendaftaran gagal di tengah jalan
-        await supabase.from('umkm').delete().eq('id', umkmId);
+        try {
+          // CLEANUP: Hapus UMKM jika proses pendaftaran gagal di tengah jalan
+          await supabase.from('umkm_documents').delete().eq('umkm_id', umkmId);
+          await supabase.from('umkm_faq').delete().eq('umkm_id', umkmId);
+          await supabase.from('umkm').delete().eq('id', umkmId);
+        } catch (e) {
+          console.warn('Gagal cleanup UMKM:', e);
+        }
       }
       console.error('Registration error:', err);
       toast.error(err.message || 'Gagal mendaftarkan toko.');

@@ -15,16 +15,29 @@ export default function SuperadminMitraApproval() {
   const fetchPending = async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase
+      const { data: umkmData, error } = await supabase
         .from('umkm')
-        .select(`
-          *,
-          profiles:owner_id ( full_name, email )
-        `)
+        .select('*')
         .eq('approval_status', 'pending');
         
       if (error && error.code !== 'PGRST116') throw error;
-      setPendingUmkm(data || []);
+      
+      const umkms: any[] = umkmData || [];
+      
+      // Fetch profiles manually since there is no direct foreign key
+      if (umkms.length > 0) {
+        const ownerIds = umkms.map(u => u.owner_id);
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .in('id', ownerIds);
+          
+        umkms.forEach(u => {
+          u.profiles = (profilesData as any[])?.find(p => p.id === u.owner_id);
+        });
+      }
+      
+      setPendingUmkm(umkms);
     } catch (err) {
       console.error('Fetch pending umkm error:', err);
       toast.error('Gagal mengambil data pengajuan mitra');
