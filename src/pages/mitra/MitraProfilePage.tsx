@@ -17,7 +17,7 @@ interface UMKMData {
   description: string;
   photo_url: string | null;
   whatsapp_number: string | null;
-  is_verified: boolean;
+  approval_status: string;
 }
 
 export default function MitraProfilePage() {
@@ -43,7 +43,7 @@ export default function MitraProfilePage() {
       try {
         const { data, error } = await supabase
           .from('umkm')
-          .select('id, name, description, photo_url, whatsapp_number, is_verified')
+          .select('id, name, description, photo_url, whatsapp_number, approval_status')
           .eq('owner_id', user.id)
           .single();
 
@@ -180,7 +180,7 @@ export default function MitraProfilePage() {
               <h1 className="text-2xl font-black text-content-primary">Profil Toko</h1>
               <p className="text-sm text-content-secondary mt-1">Kelola informasi dasar dan tampilan toko Anda.</p>
             </div>
-            {umkm.is_verified && (
+            {umkm.approval_status === 'approved' && (
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-200">
                 <Check size={14} /> Terverifikasi
               </div>
