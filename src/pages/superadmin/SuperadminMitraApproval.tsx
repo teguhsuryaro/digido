@@ -18,7 +18,8 @@ export default function SuperadminMitraApproval() {
       const { data: umkmData, error } = await supabase
         .from('umkm')
         .select('*')
-        .eq('approval_status', 'pending');
+        .eq('approval_status', 'pending')
+        .eq('is_active', false);
         
       if (error && error.code !== 'PGRST116') throw error;
       
