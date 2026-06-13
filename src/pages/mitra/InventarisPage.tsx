@@ -193,9 +193,9 @@ export default function InventarisPage() {
         {products.length > 0 ? (
           <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6">
             {products.map((product) => (
-              <Card key={product.id} className="p-4 border-border hover:border-primary-500/50 transition-colors flex flex-col sm:flex-row items-start sm:items-center gap-4 overflow-hidden">
+              <Card key={product.id} className="p-4 border-border hover:border-primary-500/50 transition-colors flex flex-col lg:flex-row items-start lg:items-center gap-4 overflow-hidden">
                 {/* Thumbnail & Title (Mobile) */}
-                <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
+                <div className="flex items-center gap-3 w-full lg:w-auto shrink-0">
                   <div className="w-16 h-16 rounded-lg bg-surface-secondary overflow-hidden shrink-0 flex items-center justify-center relative">
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
@@ -208,7 +208,7 @@ export default function InventarisPage() {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0 sm:hidden">
+                  <div className="flex-1 min-w-0 lg:hidden">
                     <h3 className="font-bold text-content-primary text-sm truncate leading-tight">{product.name}</h3>
                     <div className="flex flex-col mt-1">
                       {product.discount_percentage > 0 ? (
@@ -236,7 +236,7 @@ export default function InventarisPage() {
                 </div>
 
                 {/* Info (Desktop) */}
-                <div className="hidden sm:block flex-1 min-w-0">
+                <div className="hidden lg:block flex-1 min-w-0">
                   <h3 className="font-bold text-content-primary text-sm truncate leading-tight">{product.name}</h3>
                   <div className="flex flex-col mt-1">
                     {product.discount_percentage > 0 ? (
@@ -244,7 +244,7 @@ export default function InventarisPage() {
                         <span className="text-[10px] font-medium text-content-placeholder line-through decoration-red-500/50 mb-0.5">
                           {formatRupiah(product.price)}
                         </span>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-black text-red-500 shrink-0">
                             {formatRupiah(product.price - (product.price * product.discount_percentage / 100))}
                           </span>
@@ -253,7 +253,7 @@ export default function InventarisPage() {
                         </div>
                       </>
                     ) : (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-black text-primary-500 shrink-0">{formatRupiah(product.price)}</span>
                         <div className="w-1 h-1 bg-border rounded-full shrink-0" />
                         <span className="text-[10px] text-content-placeholder uppercase font-bold shrink-0">Stok: {product.daily_stock ?? '∞'}</span>
@@ -263,8 +263,8 @@ export default function InventarisPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/30 shrink-0">
-                  <span className="text-[10px] font-bold text-content-secondary uppercase sm:hidden">
+                <div className="flex items-center justify-between lg:justify-end w-full lg:w-auto gap-2 pt-2 lg:pt-0 border-t lg:border-t-0 border-border/30 shrink-0">
+                  <span className="text-[10px] font-bold text-content-secondary uppercase lg:hidden">
                     {product.is_available ? 'Tersedia' : 'Habis'}
                   </span>
                   

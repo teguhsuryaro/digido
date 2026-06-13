@@ -138,9 +138,9 @@ export default function UMKMDetailPage() {
         <section className="bg-surface-card rounded-card p-4 sm:p-6 border border-border shadow-sm">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
             <div className="w-full sm:w-auto min-w-0">
-              <div className="flex items-start justify-between sm:block gap-3 w-full">
+              <div className="flex items-start gap-3 w-full">
                 <h1 className="text-xl sm:text-3xl font-extrabold text-content-primary leading-tight break-words flex-1 min-w-0">{umkm.name}</h1>
-                <span className={`sm:hidden shrink-0 mt-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                <span className={`shrink-0 mt-1 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
                   umkm.is_open 
                     ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
                     : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
@@ -149,22 +149,6 @@ export default function UMKMDetailPage() {
                 </span>
               </div>
               <p className="text-content-secondary mt-1 text-sm font-medium">{umkm.business_type}</p>
-            </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0 shrink-0">
-              <span className={`hidden sm:inline-block shrink-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                umkm.is_open 
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-              }`}>
-                {umkm.is_open ? 'Buka' : 'Tutup'}
-              </span>
-              <button 
-                onClick={() => setIsReportModalOpen(true)}
-                className="w-full sm:w-auto justify-center px-3 py-1.5 rounded-lg border border-border bg-surface-secondary hover:bg-red-50 hover:border-red-200 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:border-red-900/30 text-xs text-content-secondary transition-colors flex items-center gap-1.5 font-medium shrink-0"
-              >
-                <Flag size={14} />
-                <span>Laporkan Toko</span>
-              </button>
             </div>
           </div>
 
@@ -191,6 +175,14 @@ export default function UMKMDetailPage() {
                 <span className="text-xs text-content-secondary font-medium">{distanceText}</span>
               </div>
             )}
+            
+            <button
+              onClick={() => setIsReportModalOpen(true)}
+              className="flex items-center justify-center p-1.5 px-2.5 bg-surface-secondary hover:bg-red-50 border border-border hover:border-red-200 rounded-full transition-colors group sm:ml-auto"
+              title="Laporkan Toko"
+            >
+              <Flag size={14} className="text-content-secondary group-hover:text-red-500 transition-colors" />
+            </button>
           </div>
 
           <div className="mt-5 text-content-secondary leading-relaxed text-sm bg-surface-secondary/50 p-4 rounded-xl border border-border/50 break-words">

@@ -86,25 +86,25 @@ export default function ProductCard({ product, umkmName }: ProductCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-4 flex-1 flex flex-col">
-        <h4 className="font-bold text-content-primary line-clamp-1">{product.name}</h4>
-        <p className="text-xs text-content-secondary mt-1 line-clamp-2 flex-1">
+      <div className="p-3 sm:p-4 flex-1 flex flex-col">
+        <h4 className="font-bold text-content-primary line-clamp-1 text-sm sm:text-base">{product.name}</h4>
+        <p className="text-[10px] sm:text-xs text-content-secondary mt-1 line-clamp-2 flex-1">
           {product.description}
         </p>
         
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex flex-col">
+        <div className="mt-2 sm:mt-3 flex flex-wrap items-end justify-between gap-1">
+          <div className="flex flex-col min-w-0">
             {hasDiscount && (
-              <span className="text-[10px] text-content-placeholder line-through font-medium">
+              <span className="text-[9px] sm:text-[10px] text-content-placeholder line-through font-medium truncate">
                 {formatRupiah(product.price)}
               </span>
             )}
-            <span className="font-extrabold text-primary-500 leading-none">
+            <span className="font-extrabold text-primary-500 leading-tight text-sm sm:text-base truncate">
               {formatRupiah(finalPrice)}
             </span>
           </div>
           {product.daily_stock !== null && (
-            <span className="text-[10px] text-content-placeholder">
+            <span className="text-[9px] sm:text-[10px] text-content-placeholder shrink-0 mb-0.5">
               Stok: {product.daily_stock}
             </span>
           )}
