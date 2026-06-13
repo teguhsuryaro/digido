@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, ChevronLeft } from 'lucide-react';
+import { AlertTriangle, ChevronLeft, Truck, CreditCard, Gift } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from '@/components/ui/Toast';
@@ -164,58 +164,67 @@ export default function DeliverySettingsPage() {
           </div>
         )}
 
-        <Card className="p-6 border-border space-y-8">
+        <div className="space-y-6">
           {/* Main Toggle */}
-          <div className="flex items-center justify-between p-4 bg-surface-secondary rounded-card">
-            <div className="space-y-1">
-              <p className="font-bold text-content-primary">Aktifkan Pesan Antar</p>
-              <p className="text-xs text-content-secondary">Izinkan pelanggan memesan produk untuk diantar.</p>
-            </div>
-            <button 
-              onClick={() => handleToggle(!isActive)}
-              disabled={noLocation}
-              className={`
-                w-12 h-6 rounded-full p-1 transition-colors relative
-                ${isActive ? 'bg-green-500' : 'bg-content-placeholder'}
-                ${noLocation ? 'opacity-30 cursor-not-allowed' : ''}
-              `}
-              aria-label="Toggle active delivery settings"
-            >
-              <div className={`
-                w-4 h-4 bg-white rounded-full shadow-sm transition-transform
-                ${isActive ? 'translate-x-6' : ''}
-              `} />
-            </button>
-          </div>
-
-          <div className={`space-y-8 transition-opacity ${!isActive ? 'opacity-40 pointer-events-none' : ''}`}>
-            {/* Radius */}
-            <div className="space-y-4">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-content-placeholder px-1">Radius & Jangkauan</h2>
-              <div className="flex items-end gap-3">
-                <div className="flex-1">
-                  <Input 
-                    label="Radius Maksimal (KM)" 
-                    type="number" 
-                    step="0.1"
-                    value={radius}
-                    onChange={(e) => setRadius(parseFloat(e.target.value))}
-                  />
-                </div>
-                <p className="text-xs text-content-secondary mb-3 italic">Hanya pesanan dalam radius ini yang akan diterima.</p>
+          <Card className={`p-6 border-border transition-colors ${isActive ? 'bg-primary-50/30 dark:bg-primary-950/10 border-primary-100 dark:border-primary-900/30' : 'bg-surface-secondary'}`}>
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="font-bold text-content-primary text-base">Aktifkan Pesan Antar</p>
+                <p className="text-xs text-content-secondary max-w-[200px] sm:max-w-none">Izinkan pelanggan memesan produk untuk diantar.</p>
               </div>
+              <button 
+                onClick={() => handleToggle(!isActive)}
+                disabled={noLocation}
+                className={`
+                  w-12 h-6 rounded-full p-1 transition-colors relative shrink-0
+                  ${isActive ? 'bg-primary-500' : 'bg-content-placeholder'}
+                  ${noLocation ? 'opacity-30 cursor-not-allowed' : ''}
+                `}
+                aria-label="Toggle active delivery settings"
+              >
+                <div className={`
+                  w-4 h-4 bg-white rounded-full shadow-sm transition-transform
+                  ${isActive ? 'translate-x-6' : ''}
+                `} />
+              </button>
             </div>
+          </Card>
+
+          <div className={`space-y-6 transition-all duration-300 ${!isActive ? 'opacity-40 pointer-events-none grayscale-[50%]' : ''}`}>
+            {/* Radius */}
+            <Card className="p-6 border-border">
+              <h2 className="text-sm font-bold text-content-primary mb-4 flex items-center gap-2">
+                <Truck size={18} className="text-primary-500" />
+                Radius & Jangkauan
+              </h2>
+              <div className="space-y-2">
+                <Input 
+                  label="Radius Maksimal (KM)" 
+                  type="number" 
+                  step="0.1"
+                  value={radius}
+                  onChange={(e) => setRadius(parseFloat(e.target.value))}
+                  placeholder="Contoh: 5.0"
+                />
+                <p className="text-[10px] text-content-secondary italic px-1">
+                  Hanya pesanan dalam radius ini yang akan Anda terima.
+                </p>
+              </div>
+            </Card>
 
             {/* Fee Scheme */}
-            <div className="space-y-4">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-content-placeholder px-1">Skema Tarif Ongkir</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Card className="p-6 border-border">
+              <h2 className="text-sm font-bold text-content-primary mb-4 flex items-center gap-2">
+                <CreditCard size={18} className="text-primary-500" />
+                Skema Tarif Ongkir
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                 {['free', 'flat', 'per_km'].map((type) => (
                   <button
                     key={type}
                     onClick={() => setFeeType(type as any)}
                     className={`
-                      p-4 rounded-card border-2 transition-all text-left
+                      p-4 rounded-card border-2 transition-all text-left flex flex-col justify-center min-h-[80px]
                       ${feeType === type ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20' : 'border-border hover:border-primary-500/30'}
                     `}
                   >
@@ -223,7 +232,7 @@ export default function DeliverySettingsPage() {
                       {type === 'free' ? 'Gratis' : type === 'flat' ? 'Flat' : 'Per KM'}
                     </p>
                     <p className="text-[10px] text-content-secondary mt-1">
-                      {type === 'free' ? 'Tanpa biaya ongkir' : type === 'flat' ? 'Biaya tetap sekali jalan' : 'Biaya sesuai jarak'}
+                      {type === 'free' ? 'Tanpa biaya ongkir' : type === 'flat' ? 'Biaya tetap sekali jalan' : 'Biaya dihitung sesuai jarak tempuh'}
                     </p>
                   </button>
                 ))}
@@ -236,7 +245,9 @@ export default function DeliverySettingsPage() {
                     type="number" 
                     value={flatFee}
                     onChange={(e) => setFlatFee(parseInt(e.target.value))}
+                    placeholder="Contoh: 10000"
                   />
+                  <p className="text-[10px] text-content-secondary mt-1 px-1">Biaya ongkir tetap ke semua lokasi (dalam jangkauan radius).</p>
                 </div>
               )}
 
@@ -247,39 +258,45 @@ export default function DeliverySettingsPage() {
                     type="number" 
                     value={perKmFee}
                     onChange={(e) => setPerKmFee(parseInt(e.target.value))}
+                    placeholder="Contoh: 2000"
                   />
+                  <p className="text-[10px] text-content-secondary mt-1 px-1">Biaya ongkir akan dikalikan dengan jarak (KM) antara toko dan pembeli.</p>
                 </div>
               )}
-            </div>
+            </Card>
 
             {/* Free Delivery Threshold */}
-            <div className="space-y-4">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-content-placeholder px-1">Promo Gratis Ongkir</h2>
+            <Card className="p-6 border-border">
+              <h2 className="text-sm font-bold text-content-primary mb-4 flex items-center gap-2">
+                <Gift size={18} className="text-primary-500" />
+                Promo Gratis Ongkir
+              </h2>
               <Input 
                 label="Minimal Belanja (Rp)" 
-                placeholder="0 = tidak ada minimal"
+                placeholder="0 = tidak ada minimal belanja"
                 type="number" 
                 value={minOrder}
                 onChange={(e) => setMinOrder(parseInt(e.target.value))}
               />
-              <p className="text-[10px] text-content-placeholder italic px-1">
-                * Pelanggan akan mendapatkan gratis ongkir jika total belanja melebihi nilai ini.
+              <p className="text-[10px] text-content-placeholder italic px-1 mt-2">
+                * Pelanggan akan otomatis mendapatkan gratis ongkir jika total belanja produk melebihi nominal di atas.
               </p>
-            </div>
+            </Card>
           </div>
 
-          <div className="pt-4">
+          <div className="pt-4 pb-2">
             <Button 
               variant="primary" 
               fullWidth 
               size="lg"
               isLoading={isSaving}
               onClick={handleSave}
+              className="shadow-lg shadow-primary-500/20"
             >
               Simpan Pengaturan
             </Button>
           </div>
-        </Card>
+        </div>
       </div>
     </PageTransition>
   );
