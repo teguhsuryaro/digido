@@ -46,15 +46,41 @@ export default function SuperadminUsers() {
 
       if (profilesError) throw profilesError;
 
-      // Also get report counts for these users (where target_id = profile.id)
+      // Also get report counts
       const { data: reportsData } = await supabase
         .from('reports')
-        .select('target_id');
+        .select('target_type, target_id');
+
+      const { data: umkmData } = await supabase
+        .from('umkm')
+        .select('id, owner_id');
+
+      const { data: productsData } = await supabase
+        .from('products')
+        .select('id, umkm_id');
+
+      const umkmOwnerMap = new Map((umkmData as any[])?.map(u => [u.id, u.owner_id]) || []);
+      const productUmkmMap = new Map((productsData as any[])?.map(p => [p.id, p.umkm_id]) || []);
 
       const reportCounts: Record<string, number> = {};
       (reportsData as any[])?.forEach(r => {
-        if (r.target_id) {
-          reportCounts[r.target_id] = (reportCounts[r.target_id] || 0) + 1;
+        if (!r.target_id) return;
+        
+        let profileId = null;
+        
+        if (r.target_type === 'user') {
+          profileId = r.target_id;
+        } else if (r.target_type === 'umkm') {
+          profileId = umkmOwnerMap.get(r.target_id);
+        } else if (r.target_type === 'product') {
+          const umkmId = productUmkmMap.get(r.target_id);
+          if (umkmId) {
+            profileId = umkmOwnerMap.get(umkmId);
+          }
+        }
+        
+        if (profileId) {
+          reportCounts[profileId] = (reportCounts[profileId] || 0) + 1;
         }
       });
 
