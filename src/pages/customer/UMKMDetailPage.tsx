@@ -137,10 +137,10 @@ export default function UMKMDetailPage() {
         {/* Header Section — Full-Width */}
         <section className="bg-surface-card rounded-card p-4 sm:p-6 border border-border shadow-sm">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-            <div className="w-full sm:w-auto">
-              <div className="flex items-start justify-between sm:block gap-2 w-full">
-                <h1 className="text-xl sm:text-3xl font-extrabold text-content-primary leading-tight">{umkm.name}</h1>
-                <span className={`sm:hidden shrink-0 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+            <div className="w-full sm:w-auto min-w-0">
+              <div className="flex items-start justify-between sm:block gap-3 w-full">
+                <h1 className="text-xl sm:text-3xl font-extrabold text-content-primary leading-tight break-words flex-1 min-w-0">{umkm.name}</h1>
+                <span className={`sm:hidden shrink-0 mt-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                   umkm.is_open 
                     ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
                     : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
@@ -150,7 +150,7 @@ export default function UMKMDetailPage() {
               </div>
               <p className="text-content-secondary mt-1 text-sm font-medium">{umkm.business_type}</p>
             </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0">
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0 shrink-0">
               <span className={`hidden sm:inline-block shrink-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                 umkm.is_open 
                   ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
@@ -160,7 +160,7 @@ export default function UMKMDetailPage() {
               </span>
               <button 
                 onClick={() => setIsReportModalOpen(true)}
-                className="px-3 py-1.5 rounded-lg border border-border bg-surface-secondary hover:bg-red-50 hover:border-red-200 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:border-red-900/30 text-xs text-content-secondary transition-colors flex items-center gap-1.5 font-medium ml-auto sm:ml-0"
+                className="px-3 py-1.5 rounded-lg border border-border bg-surface-secondary hover:bg-red-50 hover:border-red-200 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:border-red-900/30 text-xs text-content-secondary transition-colors flex items-center gap-1.5 font-medium ml-auto sm:ml-0 shrink-0"
               >
                 <Flag size={14} />
                 <span>Laporkan Toko</span>
@@ -193,19 +193,19 @@ export default function UMKMDetailPage() {
             )}
           </div>
 
-          <div className="mt-5 text-content-secondary leading-relaxed text-sm bg-surface-secondary/50 p-4 rounded-xl border border-border/50">
+          <div className="mt-5 text-content-secondary leading-relaxed text-sm bg-surface-secondary/50 p-4 rounded-xl border border-border/50 break-words">
             {umkm.description}
           </div>
         </section>
 
         {/* Responsive Layout — Desktop 2-column, Mobile stacked */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
           
           {/* Left Column — Info, Maps, Delivery (1/3 weight) */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-5 sm:space-y-6">
             
             {/* Location & Navigation Section */}
-            <section className="bg-surface-card rounded-card p-4 border border-border shadow-sm space-y-4">
+            <section className="bg-surface-card rounded-card p-4 sm:p-5 border border-border shadow-sm space-y-4">
               <h2 className="text-lg font-bold text-content-primary">Lokasi & Navigasi</h2>
               
               {umkm.latitude && umkm.longitude ? (
@@ -214,7 +214,7 @@ export default function UMKMDetailPage() {
                     lat={umkm.latitude} 
                     lng={umkm.longitude} 
                     label={umkm.name}
-                    className="h-64 rounded-card overflow-hidden shadow-sm border border-border"
+                    className="h-48 sm:h-64 rounded-card overflow-hidden shadow-sm border border-border relative z-0"
                   />
                   <Button 
                     variant="secondary" 
@@ -235,7 +235,7 @@ export default function UMKMDetailPage() {
             </section>
 
             {/* Delivery Info Card */}
-            <Card className="p-4">
+            <Card className="p-4 sm:p-5 shadow-sm">
               <h2 className="text-md font-bold text-content-primary mb-4 flex items-center gap-2">
                 <Truck size={16} className="text-primary-500" /> Info Pengiriman
               </h2>
@@ -256,8 +256,8 @@ export default function UMKMDetailPage() {
                     </span>
                   </div>
                   {deliverySettings.free_delivery_min_order > 0 && (
-                    <div className="mt-3 p-2 bg-primary-500/10 rounded-badge border border-primary-500/20 text-primary-600 text-[11px] font-bold flex items-center gap-1.5 justify-center">
-                      <Gift size={12} /> Gratis ongkir minimal belanja {formatRupiah(deliverySettings.free_delivery_min_order)}
+                    <div className="mt-3 p-2 bg-primary-500/10 rounded-badge border border-primary-500/20 text-primary-600 text-[11px] font-bold flex items-center gap-1.5 justify-center text-center leading-tight">
+                      <Gift size={12} className="shrink-0" /> Gratis ongkir minimal belanja {formatRupiah(deliverySettings.free_delivery_min_order)}
                     </div>
                   )}
                 </div>
@@ -275,7 +275,7 @@ export default function UMKMDetailPage() {
             <section className="bg-surface-card rounded-card p-4 sm:p-6 border border-border shadow-sm">
               <h2 className="text-lg font-bold text-content-primary mb-4">Daftar Produk</h2>
               {products.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   {products.map((product) => (
                     <div
                       key={product.id}
