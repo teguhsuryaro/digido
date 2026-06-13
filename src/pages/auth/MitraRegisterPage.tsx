@@ -18,8 +18,8 @@ interface UMKMFormData {
   latitude: number | null;
   longitude: number | null;
   // ===== FIELD BARU =====
-  shopPhotoFile: File | null;       // Foto profil toko (BARU)
-  whatsappNumber: string;           // Nomor WhatsApp toko (BARU)
+  shopPhotoFile: File | null;       // Foto profil toko
+  phoneNumber: string;              // Nomor HP Toko (Menggantikan WhatsApp)
   // ===== END FIELD BARU =====
   ktpFile: File | null;
   businessPhotoFile: File | null;
@@ -30,8 +30,8 @@ interface UMKMFormData {
 const INITIAL_DATA: UMKMFormData = {
   name: '', businessType: '', description: '',
   latitude: null, longitude: null,
-  shopPhotoFile: null,        // BARU
-  whatsappNumber: '',         // BARU
+  shopPhotoFile: null,
+  phoneNumber: '',
   ktpFile: null, businessPhotoFile: null, qrisFile: null,
   faqs: [
     { question: 'Apa menu andalan di sini?', answer: '' },
@@ -55,6 +55,8 @@ export default function MitraRegisterPage() {
   useEffect(() => {
     if (profile?.role === 'mitra') {
       navigate('/mitra', { replace: true });
+    } else if (profile && !data.phoneNumber && profile.phone) {
+      setData(prev => ({ ...prev, phoneNumber: profile.phone! }));
     }
   }, [profile, navigate]);
 
@@ -75,8 +77,8 @@ export default function MitraRegisterPage() {
         toast.warning('Mohon unggah foto profil toko.');
         return;
       }
-      if (!data.whatsappNumber || data.whatsappNumber.trim().length < 10) {
-        toast.warning('Mohon masukkan nomor WhatsApp yang valid (minimal 10 digit).');
+      if (!data.phoneNumber || data.phoneNumber.trim().length < 10) {
+        toast.warning('Mohon masukkan nomor HP yang valid (minimal 10 digit).');
         return;
       }
     }
@@ -130,7 +132,7 @@ export default function MitraRegisterPage() {
           description: data.description,
           latitude: data.latitude,
           longitude: data.longitude,
-          whatsapp_number: data.whatsappNumber,  // BARU
+          whatsapp_number: data.phoneNumber,
           is_open: false,
           has_delivery: false,
           is_active: false,
@@ -214,10 +216,15 @@ export default function MitraRegisterPage() {
         fee_type: 'free',
       } as any);
 
-      // 5. Update role ke mitra
+      // 5. Update role ke mitra dan set nomor handphone jika sebelumnya kosong
+      const profileUpdates: any = { role: 'mitra' };
+      if (!profile?.phone) {
+        profileUpdates.phone = data.phoneNumber;
+      }
+
       await supabase
         .from('profiles')
-        .update({ role: 'mitra' } as any)
+        .update(profileUpdates)
         .eq('id', user.id);
 
       // 5.5. Set is_active = true and complete the registration
@@ -231,7 +238,11 @@ export default function MitraRegisterPage() {
 
       // 6. Update local profile store
       if (profile) {
-        setProfile({ ...profile, role: 'mitra' });
+        setProfile({ 
+          ...profile, 
+          role: 'mitra',
+          ...( !profile.phone ? { phone: data.phoneNumber } : {} )
+        });
       }
 
       toast.success('Pendaftaran mitra berhasil! Selamat berjualan.');
@@ -300,14 +311,17 @@ export default function MitraRegisterPage() {
                 </div>
                 <div>
                   <Input
-                    label="Nomor WhatsApp Toko"
+                    label="Nomor Handphone Toko"
                     placeholder="Contoh: 081234567890"
-                    value={data.whatsappNumber}
-                    onChange={(e) => setData({ ...data, whatsappNumber: e.target.value })}
+                    value={data.phoneNumber}
+                    onChange={(e) => setData({ ...data, phoneNumber: e.target.value })}
+                    disabled={!!profile?.phone}
                     required
                   />
                   <p className="text-[10px] text-content-placeholder px-1 mt-1.5">
-                    Nomor ini akan digunakan oleh pelanggan untuk menghubungi toko Anda via WhatsApp.
+                    {profile?.phone 
+                      ? 'Tersinkronisasi otomatis dengan nomor handphone profil Anda.' 
+                      : 'Nomor ini akan digunakan sebagai kontak utama WhatsApp toko sekaligus disimpan di profil Anda.'}
                   </p>
                 </div>
               </div>
@@ -499,7 +513,7 @@ export default function MitraRegisterPage() {
                   <p className="text-sm"><strong>Nama:</strong> {data.name}</p>
                   <p className="text-sm"><strong>Jenis:</strong> {data.businessType}</p>
                   <p className="text-sm"><strong>Lokasi:</strong> {data.latitude?.toFixed(4)}, {data.longitude?.toFixed(4)}</p>
-                  <p className="text-sm"><strong>WhatsApp:</strong> {data.whatsappNumber}</p>
+                  <p className="text-sm"><strong>WhatsApp:</strong> {data.phoneNumber}</p>
                   <p className="text-sm"><strong>Foto Toko:</strong> {data.shopPhotoFile ? '✅ Terlampir' : '❌ Belum ada'}</p>
                 </div>
               </section>
