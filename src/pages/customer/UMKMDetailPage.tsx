@@ -150,7 +150,7 @@ export default function UMKMDetailPage() {
               </div>
               <p className="text-content-secondary mt-1 text-sm font-medium">{umkm.business_type}</p>
             </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0 shrink-0">
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0 shrink-0">
               <span className={`hidden sm:inline-block shrink-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                 umkm.is_open 
                   ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
@@ -160,7 +160,7 @@ export default function UMKMDetailPage() {
               </span>
               <button 
                 onClick={() => setIsReportModalOpen(true)}
-                className="px-3 py-1.5 rounded-lg border border-border bg-surface-secondary hover:bg-red-50 hover:border-red-200 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:border-red-900/30 text-xs text-content-secondary transition-colors flex items-center gap-1.5 font-medium ml-auto sm:ml-0 shrink-0"
+                className="w-full sm:w-auto justify-center px-3 py-1.5 rounded-lg border border-border bg-surface-secondary hover:bg-red-50 hover:border-red-200 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:border-red-900/30 text-xs text-content-secondary transition-colors flex items-center gap-1.5 font-medium shrink-0"
               >
                 <Flag size={14} />
                 <span>Laporkan Toko</span>

@@ -191,11 +191,11 @@ export default function InventarisPage() {
 
         {/* Product Grid Layout */}
         {products.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6">
             {products.map((product) => (
-              <Card key={product.id} className="p-4 border-border hover:border-primary-500/50 transition-colors flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <Card key={product.id} className="p-4 border-border hover:border-primary-500/50 transition-colors flex flex-col sm:flex-row items-start sm:items-center gap-4 overflow-hidden">
                 {/* Thumbnail & Title (Mobile) */}
-                <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
                   <div className="w-16 h-16 rounded-lg bg-surface-secondary overflow-hidden shrink-0 flex items-center justify-center relative">
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />

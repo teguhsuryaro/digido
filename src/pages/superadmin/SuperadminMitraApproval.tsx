@@ -19,7 +19,7 @@ export default function SuperadminMitraApproval() {
         .from('umkm')
         .select(`
           *,
-          profiles:owner_id ( full_name, email, phone )
+          profiles:owner_id ( full_name, email )
         `)
         .eq('approval_status', 'pending');
         
