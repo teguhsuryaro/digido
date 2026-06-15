@@ -102,16 +102,8 @@ export default function App() {
     try {
       if (!silent) setLoading(true);
 
-      // Coba ambil session dari Supabase dengan Timeout 4 detik (Mencegah bug Web Locks)
-      const sessionPromise = supabase.auth.getSession();
-      const timeoutPromise = new Promise<any>((_, reject) => 
-        setTimeout(() => reject(new Error('GET_SESSION_TIMEOUT')), 4000)
-      );
-
-      const { data: { session }, error: sessionError } = await Promise.race([
-        sessionPromise,
-        timeoutPromise
-      ]);
+      // Ambil session dari Supabase
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
       if (sessionError) {
         // Jika network error, jangan langsung logout — biarkan user lihat data lama
@@ -171,17 +163,7 @@ export default function App() {
     } catch (err: any) {
       console.error('[Auth] Initialization error:', err);
       
-      // Jika terjadi timeout pada Web Lock, hapus localStorage secara paksa
-      if (err.message === 'GET_SESSION_TIMEOUT') {
-        console.warn('[Auth] Web Lock stuck. Memaksa hapus session dari localStorage...');
-        // Hapus key standar Supabase beserta key kustom 'digido-auth'
-        Object.keys(localStorage).forEach(key => {
-          if ((key.startsWith('sb-') && key.endsWith('-auth-token')) || key === 'digido-auth') {
-            localStorage.removeItem(key);
-          }
-        });
-        useAuthStore.getState().logout();
-      } else if (!isTransientError(err)) {
+      if (!isTransientError(err)) {
         useAuthStore.getState().logout();
         await supabase.auth.signOut().catch(() => {});
       }

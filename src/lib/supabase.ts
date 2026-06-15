@@ -33,18 +33,32 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       const isStorageUpload = urlStr?.includes('/storage/v1/object/') && 
                               (options?.method === 'POST' || options?.method === 'PUT');
       
-      const fetchPromise = fetch(url, options);
-      
       // Jangan limit timeout untuk upload file/storage
       if (isStorageUpload) {
-        return fetchPromise;
+        return fetch(url, options);
       }
 
-      const timeoutPromise = new Promise<Response>((_, reject) => {
-        setTimeout(() => reject(new Error('SUPABASE_FETCH_TIMEOUT: Koneksi terputus/menggantung.')), 15000);
-      });
+      const controller = new AbortController();
+      if (options?.signal) {
+        options.signal.addEventListener('abort', () => controller.abort());
+      }
+      
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      return Promise.race([fetchPromise, timeoutPromise]);
+      try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        return response;
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          // Wajib menggunakan TypeError('Failed to fetch') agar Supabase mengenalinya
+          // sebagai gangguan jaringan (network error) biasa, bukan token error.
+          // Ini mencegah Supabase me-logout user secara tidak adil.
+          throw new TypeError('Failed to fetch');
+        }
+        throw err;
+      } finally {
+        clearTimeout(timeoutId);
+      }
     }
   }
 });
