@@ -47,7 +47,7 @@ export default function OperasionalPage() {
           .from('umkm')
           .select('*')
           .eq('owner_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         setUmkm(data);

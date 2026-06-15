@@ -35,7 +35,7 @@ export default function DeliverySettingsPage() {
           .from('umkm')
           .select('id, latitude, longitude, has_delivery')
           .eq('owner_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (umkmError) throw umkmError;
         setUmkm(umkmData as any);
@@ -45,7 +45,7 @@ export default function DeliverySettingsPage() {
           .from('delivery_settings')
           .select('*')
           .eq('umkm_id', (umkmData as any).id)
-          .single();
+          .maybeSingle();
 
         if (dsError && dsError.code !== 'PGRST116') throw dsError; // PGRST116 is not found
 

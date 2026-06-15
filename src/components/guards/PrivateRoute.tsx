@@ -13,10 +13,10 @@ export default function PrivateRoute() {
   const location = useLocation();
   const [timedOut, setTimedOut] = useState(false);
 
-  // Safety timeout: jika setelah 10 detik masih loading, tampilkan fallback
+  // Safety timeout: jika setelah 5 detik masih loading, tampilkan fallback
   useEffect(() => {
     if (!isInitialized || isLoading) {
-      const timer = setTimeout(() => setTimedOut(true), 10000);
+      const timer = setTimeout(() => setTimedOut(true), 5000);
       return () => clearTimeout(timer);
     }
     setTimedOut(false);

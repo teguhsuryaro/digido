@@ -48,7 +48,7 @@ export default function UMKMReviewsPage() {
           .from('umkm')
           .select('name')
           .eq('id', id)
-          .single();
+          .maybeSingle();
         if (umkm) setUmkmName((umkm as any).name);
 
         // 2. Fetch all reviews for this UMKM

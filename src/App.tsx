@@ -93,7 +93,10 @@ export default function App() {
     const { silent = false, isRetry = false } = opts || {};
 
     // Cegah multiple concurrent recovery
-    if (isRecoveringRef.current && !isRetry) return;
+    if (isRecoveringRef.current && !isRetry) {
+      console.log('[Auth] loadSession sudah berjalan, skip duplikat.');
+      return;
+    }
     isRecoveringRef.current = true;
 
     try {
@@ -147,7 +150,11 @@ export default function App() {
         }
       } else {
         // Tidak ada session (belum login atau sudah expired)
-        useAuthStore.getState().logout();
+        if (!silent) {
+          useAuthStore.getState().logout();
+        } else {
+          console.warn('[Auth] Silent check: session null, mempertahankan state saat ini.');
+        }
       }
     } catch (err: any) {
       console.error('[Auth] Initialization error:', err);
@@ -221,8 +228,11 @@ export default function App() {
     // 3. Visibility change — re-validasi sesi saat user kembali ke tab
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        // Saat tab kembali aktif, validasi sesi secara silent
-        loadSession({ silent: true });
+        // Saat tab kembali aktif, validasi sesi secara silent hanya jika sudah login
+        const currentState = useAuthStore.getState();
+        if (currentState.isAuthenticated()) {
+          loadSession({ silent: true });
+        }
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -235,12 +245,12 @@ export default function App() {
     };
     window.addEventListener('online', handleOnline);
 
-    // 5. Heartbeat (keep session alive & validate connection) — setiap 4 menit
+    // 5. Heartbeat (keep session alive & validate connection) — setiap 10 menit
     const heartbeatInterval = setInterval(() => {
       if (!useAuthStore.getState().isAuthenticated()) return;
       // Heartbeat hanya silent-check, tidak force logout
       loadSession({ silent: true });
-    }, 4 * 60 * 1000);
+    }, 10 * 60 * 1000);
 
     return () => {
       subscription.unsubscribe();

@@ -49,7 +49,7 @@ export default function SubscriptionPage() {
           .select('id')
           .eq('owner_id', user.id)
           .eq('is_active', true)
-          .single();
+          .maybeSingle();
 
         if (!umkm) return;
         setUmkmId((umkm as any).id);

@@ -164,7 +164,7 @@ export default function MitraRegisterPage() {
           is_active: false,
         } as any)
         .select()
-        .single();
+        .maybeSingle();
 
       if (umkmError) throw umkmError;
       umkmId = (umkm as any).id;

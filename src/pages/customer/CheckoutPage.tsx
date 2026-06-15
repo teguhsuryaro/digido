@@ -38,7 +38,7 @@ export default function CheckoutPage() {
           .from('wallets')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
         setWallet(walletData as any);
 
         // 2. Fetch UMKM Delivery Settings
@@ -46,7 +46,7 @@ export default function CheckoutPage() {
           .from('delivery_settings')
           .select('*')
           .eq('umkm_id', umkmId)
-          .single();
+          .maybeSingle();
         setDeliverySettings(deliveryData as any);
       } catch (err) {
         console.error('Error fetching checkout data:', err);
@@ -122,7 +122,7 @@ export default function CheckoutPage() {
           notes: notes || null,
         } as any)
         .select()
-        .single();
+        .maybeSingle();
 
       if (orderError) {
         console.error('Order insert error:', orderError);

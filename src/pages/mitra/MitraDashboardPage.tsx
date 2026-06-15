@@ -26,7 +26,7 @@ export default function MitraDashboardPage() {
           .from('umkm')
           .select('id')
           .eq('owner_id', user.id)
-          .single()) as any;
+          .maybeSingle()) as any;
 
         if (!umkm) return;
 

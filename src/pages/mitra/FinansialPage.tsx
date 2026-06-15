@@ -42,7 +42,7 @@ export default function FinansialPage() {
         .from('umkm')
         .select('id, name, withdrawal_method, withdrawal_provider, withdrawal_account')
         .eq('owner_id', user.id)
-        .single();
+        .maybeSingle();
       
       if (!umkmData) return;
       setUmkm(umkmData as any);

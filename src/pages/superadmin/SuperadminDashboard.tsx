@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { LayoutDashboard, Users, Store, AlertTriangle, CheckCircle, Banknote } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { formatRupiah } from '@/utils/format';
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function SuperadminDashboard() {
   const navigate = useNavigate();
+  const fetchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalMitra: 0,
@@ -84,11 +85,16 @@ export default function SuperadminDashboard() {
     
     fetchStats();
 
+    const debouncedFetchStats = () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+      fetchTimeoutRef.current = setTimeout(() => {
+        fetchStats();
+      }, 2000);
+    };
+
     const channel = supabase.channel('superadmin_dashboard')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => fetchStats())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, () => fetchStats())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'umkm' }, () => fetchStats())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchStats())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, debouncedFetchStats)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, debouncedFetchStats)
       .subscribe();
 
     return () => {

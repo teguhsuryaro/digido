@@ -39,9 +39,10 @@ export default function OrderDetailPage() {
         .from('orders')
         .select('*, umkm(name)')
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
       if (orderErr) throw orderErr;
+      if (!orderData) throw new Error('Order not found');
       setOrder(orderData);
 
       // 2. Items
@@ -179,7 +180,7 @@ export default function OrderDetailPage() {
           comment: comment.trim() || null,
         } as any)
         .select('id')
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 

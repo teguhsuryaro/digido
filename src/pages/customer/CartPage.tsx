@@ -32,7 +32,7 @@ export default function CartPage() {
           .from('delivery_settings')
           .select('*')
           .eq('umkm_id', umkmId)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         setDeliverySettings(data);

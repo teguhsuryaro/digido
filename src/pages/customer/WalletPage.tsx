@@ -36,9 +36,19 @@ export default function WalletPage() {
           .from('wallets')
           .select('id, balance')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
-        if (walletError) throw walletError;
+        if (walletError) {
+          console.warn('[WalletPage] Error fetching wallet:', walletError.message);
+        }
+        
+        if (!walletData) {
+          setWallet({ id: '', balance: 0 });
+          setTransactions([]);
+          setIsLoading(false);
+          return;
+        }
+
         setWallet(walletData as any);
 
         // 2. Fetch transactions

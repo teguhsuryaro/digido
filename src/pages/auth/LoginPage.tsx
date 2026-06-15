@@ -47,7 +47,7 @@ export default function LoginPage() {
           .from('profiles')
           .select('*')
           .eq('id', authData.user.id)
-          .single();
+          .maybeSingle();
 
         if (profile) {
           useAuthStore.getState().setAuth(authData.user, authData.session);

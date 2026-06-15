@@ -35,30 +35,32 @@ export default function OrdersPage() {
 
   useEffect(() => {
     fetchOrders();
+  }, [user]);
 
+  useEffect(() => {
     // Subscribe to Real-time updates
-    if (user) {
-      const channel = supabase
-        .channel(`public:orders:customer_id=eq.${user.id}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*', // Listen to INSERT and UPDATE
-            schema: 'public',
-            table: 'orders',
-            filter: `customer_id=eq.${user.id}`,
-          },
-          () => {
-            // Re-fetch orders when there is a change
-            fetchOrders();
-          }
-        )
-        .subscribe();
+    if (!user) return;
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
+    const channel = supabase
+      .channel(`public:orders:customer_id=eq.${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to INSERT and UPDATE
+          schema: 'public',
+          table: 'orders',
+          filter: `customer_id=eq.${user.id}`,
+        },
+        () => {
+          // Re-fetch orders when there is a change
+          fetchOrders();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const activeOrders = orders.filter(o => 

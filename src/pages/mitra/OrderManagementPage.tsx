@@ -59,7 +59,7 @@ export default function OrderManagementPage() {
         .from('umkm')
         .select('id, name')
         .eq('owner_id', user.id)
-        .single();
+        .maybeSingle();
       
         if (!umkmData) return;
         setUmkm(umkmData as any);
@@ -82,30 +82,32 @@ export default function OrderManagementPage() {
 
   useEffect(() => {
     fetchData();
+  }, [user]);
 
+  useEffect(() => {
     // Subscribe to real-time order updates
-    if (umkm?.id) {
-      const channel = supabase
-        .channel(`mitra-orders-${umkm.id}`)
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'orders', filter: `umkm_id=eq.${umkm.id}` },
-          (payload) => {
-            if (payload.eventType === 'INSERT') {
-              toast.success('Ada pesanan baru masuk! 🔔');
-              fetchData();
-            } else if (payload.eventType === 'UPDATE') {
-              setOrders(prev => prev.map(o => o.id === payload.new.id ? { ...o, ...payload.new } : o));
-            }
-          }
-        )
-        .subscribe();
+    if (!umkm?.id) return;
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [user, umkm?.id]);
+    const channel = supabase
+      .channel(`mitra-orders-${umkm.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders', filter: `umkm_id=eq.${umkm.id}` },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            toast.success('Ada pesanan baru masuk! 🔔');
+            fetchData();
+          } else if (payload.eventType === 'UPDATE') {
+            setOrders(prev => prev.map(o => o.id === payload.new.id ? { ...o, ...payload.new } : o));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [umkm?.id]);
 
   const handleReplyReview = async () => {
     if (!orderReview || !user) return;

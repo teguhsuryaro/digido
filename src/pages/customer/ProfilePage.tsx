@@ -45,7 +45,7 @@ export default function ProfilePage() {
           .from('wallets')
           .select('balance')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (!error) setWalletBalance((data as any).balance);
       } catch (err) {
@@ -92,7 +92,7 @@ export default function ProfilePage() {
         } as any)
         .eq('id', user.id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       
@@ -139,7 +139,7 @@ export default function ProfilePage() {
         .update({ avatar_url: publicUrl } as any)
         .eq('id', user.id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (updateError) throw updateError;
 

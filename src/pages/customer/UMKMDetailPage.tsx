@@ -52,9 +52,10 @@ export default function UMKMDetailPage() {
           .select('*, delivery_settings(*), reviews(rating)')
           .eq('id', id)
           .eq('is_active', true)
-          .single();
+          .maybeSingle();
 
         if (umkmError) throw umkmError;
+        if (!umkmData) throw new Error('UMKM not found');
         setUmkm(umkmData as any);
 
         // Fetch Products
