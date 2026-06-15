@@ -102,8 +102,16 @@ export default function App() {
     try {
       if (!silent) setLoading(true);
 
-      // Coba ambil session dari Supabase (termasuk refresh token jika expired)
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      // Coba ambil session dari Supabase dengan Timeout 4 detik (Mencegah bug Web Locks)
+      const sessionPromise = supabase.auth.getSession();
+      const timeoutPromise = new Promise<any>((_, reject) => 
+        setTimeout(() => reject(new Error('GET_SESSION_TIMEOUT')), 4000)
+      );
+
+      const { data: { session }, error: sessionError } = await Promise.race([
+        sessionPromise,
+        timeoutPromise
+      ]);
 
       if (sessionError) {
         // Jika network error, jangan langsung logout — biarkan user lihat data lama
@@ -162,8 +170,17 @@ export default function App() {
       }
     } catch (err: any) {
       console.error('[Auth] Initialization error:', err);
-      // Hanya force logout jika bukan error sementara
-      if (!isTransientError(err)) {
+      
+      // Jika terjadi timeout pada Web Lock, hapus localStorage secara paksa
+      if (err.message === 'GET_SESSION_TIMEOUT') {
+        console.warn('[Auth] Web Lock stuck. Memaksa hapus session dari localStorage...');
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+            localStorage.removeItem(key);
+          }
+        });
+        useAuthStore.getState().logout();
+      } else if (!isTransientError(err)) {
         useAuthStore.getState().logout();
         await supabase.auth.signOut().catch(() => {});
       }
