@@ -17,5 +17,12 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     persistSession: true,         // Simpan session di localStorage
     detectSessionInUrl: true,     // Untuk OAuth callback (jika nanti dipakai)
     storageKey: 'digido-auth',    // Key spesifik agar tidak bentrok
+    // MEMATIKAN FITUR WEB LOCK SUPABASE UNTUK MENCEGAH BUG HANG DI BROWSER
+    // @ts-ignore - Supabase versions have different lock signatures
+    lock: async (...args: any[]) => {
+      // Bypass API navigator.locks secara utuh. Eksekusi callback secara langsung.
+      const acquire = args.find(arg => typeof arg === 'function');
+      if (acquire) return await acquire();
+    }
   },
 });

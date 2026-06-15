@@ -174,8 +174,9 @@ export default function App() {
       // Jika terjadi timeout pada Web Lock, hapus localStorage secara paksa
       if (err.message === 'GET_SESSION_TIMEOUT') {
         console.warn('[Auth] Web Lock stuck. Memaksa hapus session dari localStorage...');
+        // Hapus key standar Supabase beserta key kustom 'digido-auth'
         Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          if ((key.startsWith('sb-') && key.endsWith('-auth-token')) || key === 'digido-auth') {
             localStorage.removeItem(key);
           }
         });
