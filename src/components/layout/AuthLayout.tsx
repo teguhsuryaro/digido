@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import PageErrorBoundary from '@/components/PageErrorBoundary';
 
 export default function AuthLayout() {
   return (
@@ -68,7 +69,9 @@ export default function AuthLayout() {
 
           {/* Auth Form Card */}
           <div className="bg-surface-card rounded-card border border-border shadow-card p-6 sm:p-8">
-            <Outlet />
+            <PageErrorBoundary>
+              <Outlet />
+            </PageErrorBoundary>
           </div>
         </div>
       </div>

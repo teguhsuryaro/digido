@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatRupiah, formatDate } from '@/utils/format';
@@ -25,6 +26,7 @@ type PeriodFilter = 'daily' | 'weekly' | 'monthly' | 'yearly';
 
 export default function FinansialPage() {
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const navigate = useNavigate();
   const [umkm, setUmkm] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
@@ -73,9 +75,11 @@ export default function FinansialPage() {
     }
   };
 
+  useRefetchOnFocus(fetchData, { enabled: !!user });
+
   useEffect(() => {
     fetchData();
-  }, [user]);
+  }, [user?.id, authVersion]);
 
   // Global All-Time Stats
   const globalStats = useMemo(() => {

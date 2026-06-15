@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Outlet, NavLink, Navigate } from 'react-router-dom';
 import { Home, ShoppingBag, ClipboardList, User } from 'lucide-react';
 import Navbar from './Navbar';
+import PageErrorBoundary from '@/components/PageErrorBoundary';
 import { useLocationStore } from '@/store/useLocationStore';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -40,7 +41,9 @@ export default function CustomerLayout() {
       
       {/* Konten Halaman — full-width di desktop */}
       <main className="max-w-content mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Outlet />
+        <PageErrorBoundary>
+          <Outlet />
+        </PageErrorBoundary>
       </main>
 
       {/* Bottom Navigation Bar (Mobile Only) */}

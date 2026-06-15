@@ -27,6 +27,7 @@ interface ActiveSub {
 
 export default function SubscriptionPage() {
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const navigate = useNavigate();
 
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -87,7 +88,7 @@ export default function SubscriptionPage() {
     };
 
     fetchData();
-  }, [user, refreshTrigger]);
+  }, [user?.id, refreshTrigger, authVersion]);
 
   const handleSelectPlan = (plan: Plan) => {
     setSelectedPlan(plan);

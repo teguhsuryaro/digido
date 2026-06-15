@@ -23,6 +23,7 @@ interface UMKMData {
 export default function MitraProfilePage() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [umkm, setUmkm] = useState<UMKMData | null>(null);
@@ -77,7 +78,7 @@ export default function MitraProfilePage() {
     };
 
     fetchUMKM();
-  }, [user]);
+  }, [user?.id, authVersion]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();

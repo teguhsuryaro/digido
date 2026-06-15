@@ -16,7 +16,7 @@ import ReportModal from '@/components/ReportModal';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user, profile, setProfile } = useAuthStore();
+  const { user, profile, setProfile, authVersion } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState(profile?.full_name || '');
@@ -75,7 +75,7 @@ export default function ProfilePage() {
     if (profile?.role === 'pelanggan') {
       fetchUmkmStatus();
     }
-  }, [user, profile]);
+  }, [user?.id, profile, authVersion]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();

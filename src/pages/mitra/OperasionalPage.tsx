@@ -28,6 +28,7 @@ interface ScheduleItem {
 
 export default function OperasionalPage() {
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const navigate = useNavigate();
   const [umkm, setUmkm] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +73,7 @@ export default function OperasionalPage() {
     };
 
     fetchData();
-  }, [user]);
+  }, [user?.id, authVersion]);
 
   const handleSave = async () => {
     if (!umkm || !location) return;

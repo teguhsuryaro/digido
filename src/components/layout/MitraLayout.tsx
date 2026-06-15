@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import PageErrorBoundary from '@/components/PageErrorBoundary';
 import { LayoutDashboard, Store, ClipboardList, Settings, LogOut, MessageCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -112,7 +113,9 @@ export default function MitraLayout() {
 
       {/* Main Content Area */}
       <main className="flex-1 min-w-0 w-full max-w-5xl mx-auto px-4 py-6 md:px-8">
-        <Outlet />
+        <PageErrorBoundary>
+          <Outlet />
+        </PageErrorBoundary>
       </main>
 
       {/* Mobile Bottom Nav */}

@@ -28,6 +28,7 @@ export default function HomePage() {
   const [featuredUMKM, setFeaturedUMKM] = useState<UMKM[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -82,7 +83,7 @@ export default function HomePage() {
       setIsLoading(false);
     };
     fetchFeatured();
-  }, [user]);
+  }, [user?.id, authVersion]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

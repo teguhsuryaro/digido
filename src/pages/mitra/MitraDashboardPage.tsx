@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus';
 import { Package, ShoppingCart, TrendingUp, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -9,6 +10,7 @@ import { formatRupiah } from '@/utils/format';
 
 export default function MitraDashboardPage() {
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const [stats, setStats] = useState({
     todayOrders: 0,
     todayRevenue: 0,
@@ -17,58 +19,60 @@ export default function MitraDashboardPage() {
   });
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchStats = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      // 1. Get UMKM ID
+      const { data: umkm } = (await supabase
+        .from('umkm')
+        .select('id')
+        .eq('owner_id', user.id)
+        .maybeSingle()) as any;
+
+      if (!umkm) return;
+
+      // 2. Get Products Count
+      const { data: products } = (await supabase
+        .from('products')
+        .select('id, daily_stock, is_available')
+        .eq('umkm_id', umkm.id)) as any;
+
+      const totalProducts = products?.length || 0;
+      const lowStockProducts = products?.filter((p: any) => p.is_available && p.daily_stock !== null && p.daily_stock <= 5).length || 0;
+
+      // 3. Get Today's Orders (only completed, to match FinansialPage)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const { data: orders } = (await supabase
+        .from('orders')
+        .select('id, total, admin_fee, status')
+        .eq('umkm_id', umkm.id)
+        .eq('status', 'completed')
+        .gte('created_at', today.toISOString())) as any;
+
+      const todayOrders = orders?.length || 0;
+      const todayRevenue = orders?.reduce((sum: number, o: any) => sum + (o.total - (o.admin_fee || 500)), 0) || 0;
+
+      setStats({
+        todayOrders,
+        todayRevenue,
+        totalProducts,
+        lowStockProducts,
+      });
+
+    } catch (err) {
+      console.error('Error fetching dashboard stats:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.id]);
+
+  useRefetchOnFocus(fetchStats, { enabled: !!user });
+
   useEffect(() => {
-    const fetchStats = async () => {
-      if (!user) return;
-      try {
-        // 1. Get UMKM ID
-        const { data: umkm } = (await supabase
-          .from('umkm')
-          .select('id')
-          .eq('owner_id', user.id)
-          .maybeSingle()) as any;
-
-        if (!umkm) return;
-
-        // 2. Get Products Count
-        const { data: products } = (await supabase
-          .from('products')
-          .select('id, daily_stock, is_available')
-          .eq('umkm_id', umkm.id)) as any;
-
-        const totalProducts = products?.length || 0;
-        const lowStockProducts = products?.filter((p: any) => p.is_available && p.daily_stock !== null && p.daily_stock <= 5).length || 0;
-
-        // 3. Get Today's Orders (only completed, to match FinansialPage)
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const { data: orders } = (await supabase
-          .from('orders')
-          .select('id, total, admin_fee, status')
-          .eq('umkm_id', umkm.id)
-          .eq('status', 'completed')
-          .gte('created_at', today.toISOString())) as any;
-
-        const todayOrders = orders?.length || 0;
-        const todayRevenue = orders?.reduce((sum: number, o: any) => sum + (o.total - (o.admin_fee || 500)), 0) || 0;
-
-        setStats({
-          todayOrders,
-          todayRevenue,
-          totalProducts,
-          lowStockProducts,
-        });
-
-      } catch (err) {
-        console.error('Error fetching dashboard stats:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchStats();
-  }, [user]);
+  }, [fetchStats, authVersion]);
 
   if (isLoading) {
     return (

@@ -21,12 +21,15 @@ interface AuthState {
   profile: Profile | null;
   isLoading: boolean;
   isInitialized: boolean;
+  authVersion: number;
 
   // Actions
   setAuth: (user: User | null, session: Session | null) => void;
   setProfile: (profile: Profile | null) => void;
   setLoading: (loading: boolean) => void;
   setInitialized: (initialized: boolean) => void;
+  bumpAuthVersion: () => void;
+  refreshSession: (session: Session) => void;
   logout: () => Promise<void> | void;
 
   // Computed-like getters
@@ -43,16 +46,51 @@ export const useAuthStore = create<AuthState>()(
       profile: null,
       isLoading: true,
       isInitialized: false,
+      authVersion: 0,
 
       // Actions
-      setAuth: (user, session) => set({ user, session }, false, 'setAuth'),
+      setAuth: (user, session) => {
+        const current = get();
+        if (current.user?.id === user?.id && current.session?.access_token === session?.access_token) {
+          return;
+        }
+        set({ user, session }, false, 'setAuth');
+      },
 
-      setProfile: (profile) => set({ profile }, false, 'setProfile'),
+      setProfile: (profile) => {
+        const current = get();
+        if (
+          current.profile?.id === profile?.id &&
+          current.profile?.full_name === profile?.full_name &&
+          current.profile?.role === profile?.role &&
+          current.profile?.ban_status === profile?.ban_status &&
+          current.profile?.avatar_url === profile?.avatar_url &&
+          current.profile?.phone === profile?.phone
+        ) {
+          return;
+        }
+        set({ profile }, false, 'setProfile');
+      },
 
       setLoading: (isLoading) => set({ isLoading }, false, 'setLoading'),
 
       setInitialized: (isInitialized) =>
-        set({ isInitialized, isLoading: false }, false, 'setInitialized'),
+        set(
+          (state) => ({
+            isInitialized,
+            ...(state.isLoading ? { isLoading: false } : {}),
+          }),
+          false,
+          'setInitialized'
+        ),
+
+      bumpAuthVersion: () => set(
+        (state) => ({ authVersion: state.authVersion + 1 }),
+        false,
+        'bumpAuthVersion'
+      ),
+
+      refreshSession: (session) => set({ session }, false, 'refreshSession'),
 
       logout: () => {
         set(

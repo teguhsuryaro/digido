@@ -128,6 +128,10 @@ export default function App() {
           if (profile) {
             setAuth(session.user, session);
             setProfile(profile);
+            
+            if (silent) {
+              useAuthStore.getState().bumpAuthVersion();
+            }
           } else {
             // Profile tidak ditemukan — kemungkinan trigger DB belum jalan
             console.warn('[Auth] Profile tidak ditemukan untuk user:', session.user.id);
@@ -215,7 +219,7 @@ export default function App() {
           }
 
           if (event === 'TOKEN_REFRESHED' && session) {
-            setAuth(session.user, session);
+            useAuthStore.getState().refreshSession(session);
           }
         } catch (err) {
           console.error('[Auth] Auth state change error:', err);

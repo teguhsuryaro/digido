@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatRupiah, formatDate } from '@/utils/format';
@@ -22,53 +23,56 @@ interface Transaction {
 
 export default function WalletPage() {
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const [wallet, setWallet] = useState<WalletState | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) return;
+  const fetchData = useCallback(async () => {
+    if (!user?.id) return;
 
-    const fetchData = async () => {
-      try {
-        // 1. Fetch wallet balance
-        const { data: walletData, error: walletError } = await supabase
-          .from('wallets')
-          .select('id, balance')
-          .eq('user_id', user.id)
-          .maybeSingle();
+    try {
+      // 1. Fetch wallet balance
+      const { data: walletData, error: walletError } = await supabase
+        .from('wallets')
+        .select('id, balance')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-        if (walletError) {
-          console.warn('[WalletPage] Error fetching wallet:', walletError.message);
-        }
-        
-        if (!walletData) {
-          setWallet({ id: '', balance: 0 });
-          setTransactions([]);
-          setIsLoading(false);
-          return;
-        }
-
-        setWallet(walletData as any);
-
-        // 2. Fetch transactions
-        const { data: txData, error: txError } = await supabase
-          .from('wallet_transactions')
-          .select('id, type, amount, description, created_at')
-          .eq('wallet_id', (walletData as any).id)
-          .order('created_at', { ascending: false });
-
-        if (txError) throw txError;
-        setTransactions((txData as any) || []);
-      } catch (err) {
-        console.error('Error fetching wallet data:', err);
-      } finally {
-        setIsLoading(false);
+      if (walletError) {
+        console.warn('[WalletPage] Error fetching wallet:', walletError.message);
       }
-    };
+      
+      if (!walletData) {
+        setWallet({ id: '', balance: 0 });
+        setTransactions([]);
+        setIsLoading(false);
+        return;
+      }
 
+      setWallet(walletData as any);
+
+      // 2. Fetch transactions
+      const { data: txData, error: txError } = await supabase
+        .from('wallet_transactions')
+        .select('id, type, amount, description, created_at')
+        .eq('wallet_id', (walletData as any).id)
+        .order('created_at', { ascending: false });
+
+      if (txError) throw txError;
+      setTransactions((txData as any) || []);
+    } catch (err) {
+      console.error('Error fetching wallet data:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.id]);
+
+  useRefetchOnFocus(fetchData, { enabled: !!user });
+
+  useEffect(() => {
     fetchData();
-  }, [user]);
+  }, [fetchData, authVersion]);
 
   return (
     <PageTransition>

@@ -13,6 +13,7 @@ import Skeleton from '@/components/ui/Skeleton';
 export default function DeliverySettingsPage() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const [umkm, setUmkm] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -67,7 +68,7 @@ export default function DeliverySettingsPage() {
     };
 
     fetchData();
-  }, [user]);
+  }, [user?.id, authVersion]);
 
   const handleToggle = (checked: boolean) => {
     if (checked && (!umkm?.latitude || !umkm?.longitude)) {

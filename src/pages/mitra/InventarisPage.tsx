@@ -17,6 +17,7 @@ export default function InventarisPage() {
   const locationState = useLocation();
   const isFromSettings = locationState.pathname.includes('/pengaturan');
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const [umkm, setUmkm] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,7 +71,7 @@ export default function InventarisPage() {
 
   useEffect(() => {
     fetchData();
-  }, [user]);
+  }, [user?.id, authVersion]);
 
   const handleToggleStock = async (product: any) => {
     const newStatus = !product.is_available;

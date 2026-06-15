@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatRupiah, formatDate } from '@/utils/format';
@@ -23,6 +24,7 @@ const TABS = [
 
 export default function OrderManagementPage() {
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const [umkm, setUmkm] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState(0);
@@ -80,9 +82,11 @@ export default function OrderManagementPage() {
     }
   };
 
+  useRefetchOnFocus(fetchData, { enabled: !!user });
+
   useEffect(() => {
     fetchData();
-  }, [user]);
+  }, [user?.id, authVersion]);
 
   useEffect(() => {
     // Subscribe to real-time order updates
@@ -107,7 +111,7 @@ export default function OrderManagementPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [umkm?.id]);
+  }, [umkm?.id, authVersion]);
 
   const handleReplyReview = async () => {
     if (!orderReview || !user) return;

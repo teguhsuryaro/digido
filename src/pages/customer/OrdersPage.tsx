@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ClipboardList } from 'lucide-react';
@@ -10,6 +11,7 @@ type TabType = 'active' | 'history';
 
 export default function OrdersPage() {
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const [activeTab, setActiveTab] = useState<TabType>('active');
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,9 +35,11 @@ export default function OrdersPage() {
     }
   };
 
+  useRefetchOnFocus(fetchOrders, { enabled: !!user });
+
   useEffect(() => {
     fetchOrders();
-  }, [user]);
+  }, [user?.id, authVersion]);
 
   useEffect(() => {
     // Subscribe to Real-time updates
@@ -61,7 +65,7 @@ export default function OrdersPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id, authVersion]);
 
   const activeOrders = orders.filter(o => 
     !['completed', 'cancelled', 'rejected'].includes(o.status)

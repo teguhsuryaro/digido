@@ -5,6 +5,7 @@ import { handleLogout } from '@/utils/logout';
 import Button from '@/components/ui/Button';
 import ConfirmLogoutModal from '@/components/ui/ConfirmLogoutModal';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import PageErrorBoundary from '@/components/PageErrorBoundary';
 import { useState } from 'react';
 
 const sidenavItems = [
@@ -102,7 +103,9 @@ export default function SuperadminLayout() {
         </header>
 
         <div className="w-full max-w-5xl mx-auto px-4 py-6 md:px-8">
-          <Outlet />
+          <PageErrorBoundary>
+            <Outlet />
+          </PageErrorBoundary>
         </div>
       </main>
 

@@ -15,6 +15,7 @@ import QRISDisplay from '@/components/QRISDisplay';
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
+  const authVersion = useAuthStore((s) => s.authVersion);
   const { items, umkmId, umkmName, getSubtotal, clearCart } = useCartStore();
 
   const [wallet, setWallet] = useState<any>(null);
@@ -54,7 +55,7 @@ export default function CheckoutPage() {
     };
 
     fetchData();
-  }, [user, umkmId]);
+  }, [user?.id, umkmId, authVersion]);
 
   // Hitung Ongkir
   let deliveryFee = 0;
