@@ -2,7 +2,7 @@ import { ErrorBoundary } from './ErrorBoundary';
 import type { ReactNode } from 'react';
 
 interface Props {
-  children: ReactNode;
+  children?: ReactNode;
   pageName?: string;
 }
 

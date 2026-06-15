@@ -4,7 +4,7 @@ import { AlertTriangle, RefreshCw, RotateCcw } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 interface Props {
-  children: ReactNode;
+  children?: ReactNode;
   /** Jika true, tampilan error fullscreen. Jika false, tampilan inline (untuk per-page boundary). */
   fullscreen?: boolean;
   /** Label fallback untuk tombol (opsional) */
