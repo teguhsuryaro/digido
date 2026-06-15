@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw, RotateCcw } from 'lucide-react';
+import { AlertTriangle, RotateCcw } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 interface Props {
