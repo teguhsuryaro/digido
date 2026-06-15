@@ -40,10 +40,9 @@ export default function OperasionalPage() {
   const [overrideStatus, setOverrideStatus] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchData = async () => {
       try {
+        if (!user) return;
         const { data, error } = await supabase
           .from('umkm')
           .select('*')

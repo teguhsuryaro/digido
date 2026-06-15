@@ -53,9 +53,9 @@ export default function OrderManagementPage() {
   };
 
   const fetchData = async () => {
-    if (!user) return;
-    
     try {
+      if (!user) return;
+      
       // 1. Get UMKM
       const { data: umkmData } = await supabase
         .from('umkm')

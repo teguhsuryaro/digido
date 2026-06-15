@@ -38,10 +38,9 @@ export default function MitraProfilePage() {
   const [activePlan, setActivePlan] = useState<string>('Free');
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchUMKM = async () => {
       try {
+        if (!user) return;
         const { data, error } = await supabase
           .from('umkm')
           .select('id, name, description, photo_url, whatsapp_number, approval_status')

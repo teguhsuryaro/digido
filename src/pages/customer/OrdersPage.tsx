@@ -17,9 +17,9 @@ export default function OrdersPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchOrders = async () => {
-    if (!user) return;
-    
     try {
+      if (!user) return;
+      
       const { data, error } = await supabase
         .from('orders')
         .select('*, umkm(name)')

@@ -29,9 +29,9 @@ export default function WalletPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
-    if (!user?.id) return;
-
     try {
+      if (!user?.id) return;
+
       // 1. Fetch wallet balance
       const { data: walletData, error: walletError } = await supabase
         .from('wallets')

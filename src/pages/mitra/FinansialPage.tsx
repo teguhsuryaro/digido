@@ -37,8 +37,9 @@ export default function FinansialPage() {
   const [isMethodModalOpen, setIsMethodModalOpen] = useState(false);
 
   const fetchData = async () => {
-    if (!user) return;
     try {
+      if (!user) return;
+      
       // 1. Get UMKM owned by user
       const { data: umkmData } = await supabase
         .from('umkm')

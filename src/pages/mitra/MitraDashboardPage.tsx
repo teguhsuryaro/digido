@@ -20,8 +20,9 @@ export default function MitraDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchStats = useCallback(async () => {
-    if (!user?.id) return;
     try {
+      if (!user?.id) return;
+      
       // 1. Get UMKM ID
       const { data: umkm } = (await supabase
         .from('umkm')

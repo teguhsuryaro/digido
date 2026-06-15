@@ -27,10 +27,9 @@ export default function DeliverySettingsPage() {
   const [minOrder, setMinOrder] = useState(0);
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchData = async () => {
       try {
+        if (!user) return;
         // 1. Get UMKM
         const { data: umkmData, error: umkmError } = await supabase
           .from('umkm')

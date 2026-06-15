@@ -40,10 +40,10 @@ export default function SubscriptionPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchData = async () => {
       try {
+        if (!user) return;
+
         // 1. Get UMKM milik user
         const { data: umkm } = await supabase
           .from('umkm')

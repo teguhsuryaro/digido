@@ -32,55 +32,61 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchFeatured = async () => {
-      const now = new Date().toISOString();
-      let query = supabase
-        .from('umkm')
-        .select(`
-          id, name, business_type, description, is_open, photo_url, latitude, longitude,
-          reviews(rating),
-          delivery_settings(is_active, free_delivery_min_order),
-          subscriptions!inner(id, status, expires_at)
-        `)
-        .eq('is_active', true)
-        .eq('subscriptions.status', 'active')
-        .gte('subscriptions.expires_at', now)
-        .limit(6);
+      try {
+        const now = new Date().toISOString();
+        let query = supabase
+          .from('umkm')
+          .select(`
+            id, name, business_type, description, is_open, photo_url, latitude, longitude,
+            reviews(rating),
+            delivery_settings(is_active, free_delivery_min_order),
+            subscriptions!inner(id, status, expires_at)
+          `)
+          .eq('is_active', true)
+          .eq('subscriptions.status', 'active')
+          .gte('subscriptions.expires_at', now)
+          .limit(6);
+          
+        if (user) {
+          query = query.neq('owner_id', user.id);
+        }
         
-      if (user) {
-        query = query.neq('owner_id', user.id);
+        const { data, error } = await query;
+        if (error) throw error;
+        
+        const processed = ((data as any) || []).map((u: any) => {
+          const ratings = u.reviews?.map((r: any) => r.rating) || [];
+          const avgRating = ratings.length > 0 
+            ? ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length 
+            : 0;
+
+          const settings = Array.isArray(u.delivery_settings)
+            ? u.delivery_settings[0]
+            : u.delivery_settings;
+
+          return {
+            id: u.id,
+            name: u.name,
+            business_type: u.business_type,
+            description: u.description || '',
+            is_open: u.is_open,
+            avg_rating: avgRating,
+            review_count: ratings.length,
+            has_delivery: settings?.is_active || false,
+            is_free_delivery: (settings?.free_delivery_min_order || 0) > 0,
+            photo_url: u.photo_url || null,  // BARU
+            is_unggulan: true,
+            latitude: u.latitude,
+            longitude: u.longitude,
+          };
+        });
+
+        setFeaturedUMKM(processed);
+      } catch (err) {
+        console.error('Error fetching featured UMKM:', err);
+      } finally {
+        setIsLoading(false);
       }
-      
-      const { data } = await query;
-      
-      const processed = ((data as any) || []).map((u: any) => {
-        const ratings = u.reviews?.map((r: any) => r.rating) || [];
-        const avgRating = ratings.length > 0 
-          ? ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length 
-          : 0;
-
-        const settings = Array.isArray(u.delivery_settings)
-          ? u.delivery_settings[0]
-          : u.delivery_settings;
-
-        return {
-          id: u.id,
-          name: u.name,
-          business_type: u.business_type,
-          description: u.description || '',
-          is_open: u.is_open,
-          avg_rating: avgRating,
-          review_count: ratings.length,
-          has_delivery: settings?.is_active || false,
-          is_free_delivery: (settings?.free_delivery_min_order || 0) > 0,
-          photo_url: u.photo_url || null,  // BARU
-          is_unggulan: true,
-          latitude: u.latitude,
-          longitude: u.longitude,
-        };
-      });
-
-      setFeaturedUMKM(processed);
-      setIsLoading(false);
     };
     fetchFeatured();
   }, [user?.id, authVersion]);

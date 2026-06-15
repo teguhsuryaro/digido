@@ -37,10 +37,9 @@ export default function ProfilePage() {
   }, [profile]);
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchWallet = async () => {
       try {
+        if (!user) return;
         const { data, error } = await supabase
           .from('wallets')
           .select('balance')
@@ -57,6 +56,7 @@ export default function ProfilePage() {
 
     const fetchUmkmStatus = async () => {
       try {
+        if (!user) return;
         const { data, error } = await supabase
           .from('umkm')
           .select('approval_status')

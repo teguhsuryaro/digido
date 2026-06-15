@@ -133,10 +133,10 @@ export default function App() {
               useAuthStore.getState().bumpAuthVersion();
             }
           } else {
-            // Profile tidak ditemukan — kemungkinan trigger DB belum jalan
-            console.warn('[Auth] Profile tidak ditemukan untuk user:', session.user.id);
-            setAuth(session.user, session);
-            // Jangan logout, biarkan user tetap di app
+            // Profile tidak ditemukan — kemungkinan RLS menyembunyikan karena token kedaluwarsa atau invalid
+            console.warn('[Auth] Profile tidak ditemukan untuk user:', session.user.id, '— Melakukan force logout untuk membersihkan sesi.');
+            useAuthStore.getState().logout();
+            await supabase.auth.signOut().catch(() => {});
           }
         } catch (profileErr) {
           if (isTransientError(profileErr)) {
